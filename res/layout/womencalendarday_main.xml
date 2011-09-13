@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:gravity="center"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="#FFFFFFFF"
+  android:orientation="vertical">
+  <LinearLayout android:orientation="vertical"
+  	android:padding="5.0dip"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_margin="2.0dip">
+  	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<LinearLayout android:orientation="horizontal"
+			android:id="@+id/prev_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0">
+			<ImageView android:id="@+id/prev"
+				android:paddingLeft="7.0dip"
+				android:paddingTop="3.0dip"
+				android:duplicateParentState="true"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/previous_month">
+			</ImageView>
+		</LinearLayout>
+		<LinearLayout android:orientation="horizontal"
+			android:paddingTop="3.0dip"
+			android:paddingBottom="3.0dip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.0">
+			<TextView android:textSize="20.0sp"
+				android:textColor="#FF000000"
+				android:gravity="center"
+				android:id="@+id/date"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="0000">
+			</TextView>
+		</LinearLayout>
+		<LinearLayout android:gravity="right"
+			android:orientation="vertical"
+			android:id="@+id/next_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0">
+			<ImageView android:id="@+id/next"
+				android:paddingTop="3.0dip"
+				android:paddingRight="7.0dip"
+				android:duplicateParentState="true"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/next_month">
+			</ImageView>
+		</LinearLayout>		
+  	</LinearLayout>
+  	<LinearLayout
+		android:orientation="vertical"
+		android:background="#FF9C9D9C"
+		android:layout_width="match_parent"
+		android:layout_height="1.0dip"
+		android:layout_marginLeft="2.0dip"
+		android:layout_marginTop="1.0dip"
+		android:layout_marginRight="2.0dip"
+		android:layout_marginBottom="3.0dip">
+	</LinearLayout>
+	<TextView android:textColor="#FF000000"
+		android:id="@+id/no_parameters_label_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="4.0dip"
+		android:layout_marginBottom="5.0dip"
+		android:text="@string/no_parameters">
+	</TextView>
+	<LinearLayout android:orientation="vertical"
+		android:id="@+id/note_layout"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:visibility="gone">
+		<TextView android:textColor="#FF000000"
+			android:id="@+id/note_label_view"
+			android:paddingRight="3.0dip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/note_label">
+		</TextView>
+		<TextView android:textColor="#FF000000"
+			android:id="@+id/note_text_view"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text=""
+			android:layout_weight="1.0">
+		</TextView>
+	</LinearLayout>
+	<LinearLayout android:orientation="horizontal"
+		android:id="@+id/date_info_layout"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:visibility="gone">
+	</LinearLayout>
+	<TextView android:textColor="#FF000000"
+		android:id="@+id/parameter_description_text_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text=""
+		android:visibility="gone">
+	</TextView>
+  </LinearLayout>
+  <LinearLayout android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="2.0dip">
+  </LinearLayout>
+	
+  <LinearLayout	android:orientation="vertical"
+	android:id="@+id/action_layout"
+	android:background="#FFFFFFFF"
+	android:paddingLeft="1.0dip"
+	android:paddingTop="1.0dip"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:layout_weight="1.0">
+	<!-- First Row -->
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1.0">
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/start_period"
+			android:layout_weight="1.0"
+			android:clickable = "true"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/start_period_image"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_start_period"
+					android:layout_weight="0.0" 
+					android:paddingTop="5.0dip"
+					android:paddingLeft="5.0dip">
+				</ImageView>
+				<TextView android:id="@+id/day_start_period_label_view" 
+					android:layout_weight="1.0" 
+					android:text="@string/start_period"
+					android:layout_marginTop="3.0dip"  
+					android:layout_marginRight="6.0dip" 
+					android:layout_height="wrap_content" 
+					android:textColor="#FF000000" 
+					android:layout_width="wrap_content" 
+					android:textSize="12.0sp" 
+					android:gravity="right"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/pill_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginTop="3.0dip"
+					android:layout_marginRight="6.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/end_period"
+			android:clickable = "true"
+			android:layout_weight="1.0"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:layout_weight="0.0" 
+					android:layout_height="wrap_content" 
+					android:duplicateParentState="true" 
+					android:layout_width="wrap_content" 
+					android:id="@+id/end_period_image" 
+					android:src="@drawable/day_end_period"
+					android:paddingTop="5.0dip" 
+					android:paddingLeft="5.0dip">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_end_period_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/end_period"
+					android:textSize="12.0sp"
+					android:layout_marginTop="3.0dip"
+					android:layout_marginRight="6.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/pill_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/pill_container"
+			android:clickable = "true"
+			android:layout_weight="1.0"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/pill_image"
+					android:paddingTop="5.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_pill"
+					android:layout_weight="0.0">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_pill_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/pill"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/pill_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>				
+	</LinearLayout>
+	
+	<!-- Second row -->
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1.0">
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/day_bmt"
+			android:clickable = "true"
+			android:layout_weight="1.0"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/day_bmt_image"
+					android:paddingTop="5.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_temperature"
+					android:layout_weight="0.0">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_bmt_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_bmt"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_bmt_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/day_note"
+			android:clickable = "true"
+			android:layout_weight="1.0"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/day_note_image"
+					android:paddingTop="3.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_note"
+					android:layout_weight="0.0">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_note_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_note"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_note_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/day_sex"
+			android:clickable = "true"
+			android:layout_weight="1.0"
+			android:background="@drawable/action_button_background">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/day_sex_image"
+					android:paddingTop="3.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_sex"
+					android:layout_weight="0.0">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_sex_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_sex"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_sex_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>			
+	</LinearLayout>
+	
+	<!-- Third row -->
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1.0">
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/cervical_mucus"
+			android:clickable = "true"
+			android:background="@drawable/action_button_background"
+			android:layout_weight="1.0">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/cervical_mucus_image"
+					android:paddingTop="3.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_cervical_mucus"
+					android:layout_weight="0.0"
+					android:textStyle="bold">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_cervical_mucus_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_cervical_mucus"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_cervical_mucus_pro"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="center"
+					android:text="@string/pro"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/day_mood"
+			android:clickable = "true"
+			android:background="@drawable/action_button_background"
+			android:layout_weight="1.0">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/day_mood_image"
+					android:paddingTop="3.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_mood_none"
+					android:layout_weight="0.0"
+					android:textStyle="bold">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_mood_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_mood"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_mood_pro"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="center"
+					android:text="@string/pro"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/day_weight"
+			android:clickable = "true"
+			android:background="@drawable/action_button_background"
+			android:layout_weight="1.0">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/day_weight_image"
+					android:paddingTop="3.0dip"
+					android:paddingLeft="5.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/day_weight"
+					android:layout_weight="0.0">
+				</ImageView>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_weight_label_view"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/day_weight"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="3.0">>
+				<TextView android:textColor="#FF000000"
+					android:id="@+id/day_weight_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="right"
+					android:text="@string/add"
+					android:textSize="12.0sp"
+					android:layout_marginRight="6.0dip"
+					android:layout_marginTop="3.0dip"
+					android:layout_weight="1.0"
+					android:textStyle="bold">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>			
+	</LinearLayout>
+  </LinearLayout>
+  <LinearLayout android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="3.0dip">
+  </LinearLayout>
+  <LinearLayout	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_marginTop="1.0dip">
+	<Button android:id="@+id/remove_all"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_marginRight="1.0dip"
+		android:text="@string/remove_all"
+		android:textSize="12.0sp"
+		android:layout_weight="1.0"
+		android:textStyle="bold">
+	</Button>
+	<Button android:id="@+id/back"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:text="@string/back_to_calendar"
+		android:textSize="12.0sp"
+		android:layout_weight="1.0"
+		android:textStyle="bold">
+	</Button>
+	</LinearLayout> 
+	<LinearLayout android:gravity="bottom"
+			android:orientation="vertical"
+			android:id="@+id/ad_layout"
+			android:background="@drawable/ad_background"
+			android:layout_width="match_parent"
+			android:layout_height="50.0dip">
+	</LinearLayout>   
+</LinearLayout>

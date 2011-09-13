@@ -1,0 +1,135 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/month_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="#FFE77D89">
+
+	<LinearLayout android:orientation="vertical"
+		android:id="@+id/calendar_container"
+		android:background="@drawable/header_logo"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="39.0dip">
+			<LinearLayout
+				android:gravity="center_vertical|right"
+				android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+				<include layout="@layout/top_buttons">
+				</include>
+			</LinearLayout>
+		</LinearLayout>
+		<TextView
+			android:textColor="#FFFFFFFF"
+			android:gravity="center"
+			android:id="@+id/calendar_title"
+			android:background="#4270353A"
+			android:padding="2.0dip"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="0000">
+		</TextView>
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="3.0dip"
+			>
+		</LinearLayout>	  			
+	  	<LinearLayout android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="#FFF5F5F5">
+			<LinearLayout android:orientation="horizontal"
+				android:id="@+id/prev_container"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/prev"
+					android:paddingLeft="7.0dip"
+					android:paddingTop="3.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:src="@drawable/previous_month_standard">
+				</ImageView>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+				android:paddingTop="3.0dip"
+				android:paddingBottom="3.0dip"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="0.0">
+				<TextView android:textSize="20.0sp"
+					android:textColor="#FF000000"
+					android:gravity="center"
+					android:id="@+id/month_title"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="00.00.0000">
+				</TextView>
+			</LinearLayout>
+			<LinearLayout android:gravity="right"
+				android:orientation="vertical"
+				android:id="@+id/next_container"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1.0">
+				<ImageView android:id="@+id/next"
+					android:paddingTop="3.0dip"
+					android:paddingRight="7.0dip"
+					android:duplicateParentState="true"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:src="@drawable/next_month_standard">
+				</ImageView>
+			</LinearLayout>		
+	  	</LinearLayout>
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="3.0dip">
+		</LinearLayout>
+	    <LinearLayout android:id="@+id/weekdays_layout"
+	        android:orientation="horizontal"
+	        android:background="#4270353A"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+
+	        <TextView android:id="@+id/day0"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day1"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day2"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day3"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day4"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day5"
+	            style="@style/MonthView_DayLabel" />
+	        <TextView android:id="@+id/day6"
+	            style="@style/MonthView_DayLabel" />
+	    </LinearLayout>
+	    <LinearLayout android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="3.0dip">
+		</LinearLayout>
+		<LinearLayout android:orientation="vertical"
+			android:id="@+id/calendar_layout"
+			android:padding="1.0dip"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_weight="1.0">
+		</LinearLayout>
+		<LinearLayout android:gravity="bottom"
+			android:orientation="vertical"
+			android:id="@+id/ad_layout"
+			android:background="@drawable/ad_background"
+			android:layout_width="match_parent"
+			android:layout_height="50.0dip">
+		</LinearLayout>
+	</LinearLayout>
+</LinearLayout>
+

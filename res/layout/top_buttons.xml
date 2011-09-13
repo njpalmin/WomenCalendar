@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+	<ImageView android:id="@+id/top_calendar"
+		android:paddingLeft="8.0dip"
+		android:paddingRight="8.0dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/top_calendar_standard">
+	</ImageView>
+	<ImageView android:id="@+id/top_bmt_chart"
+		android:paddingLeft="8.0dip"
+		android:paddingRight="8.0dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/top_bmt_chart_standard">
+	</ImageView>
+	<ImageView android:id="@+id/top_weight_chart"
+		android:paddingLeft="8.0dip"
+		android:paddingRight="8.0dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/top_weight_chart">
+	</ImageView>
+	<ImageView android:id="@+id/top_pro"
+		android:paddingLeft="8.0dip"
+		android:paddingRight="8.0dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/top_round_calendar_or_pro_standard">
+	</ImageView>
+</merge>

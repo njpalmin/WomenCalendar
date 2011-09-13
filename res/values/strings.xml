@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, WomenCalendarActivity!</string>
+    <string name="app_name">WomenCalendar</string>
+    <string name="main">Main</string>
+    <string name="temp">Temp</string>
+    <string name="weight">Weight</string>
+    <string name="pro">Pro</string>
+    <string name="no_parameters">No parameters specified</string>
+ 	<string name="note_label">Note</string>
+ 	<string name="remove_all">Remove all parameters</string>
+ 	<string name="back_to_calendar">Back to calendar</string>
+ 	<string name="pill">Pill</string>
+ 	<string name="add">Add</string>
+ 	<string name="end_period">End\n Period</string>
+ 	<string name="start_period">Start\n Period</string>
+ 	<string name="day_cervical_mucus">Cervical\n Mucus</string>
+ 	<string name="day_mood">Mood</string>
+ 	<string name="day_weight">Weight</string>
+ 	<string name="day_bmt">BMT</string>
+ 	<string name="day_note">Note</string>
+ 	<string name="day_sex">Sex</string>
+</resources>
