@@ -107,7 +107,7 @@ public class WomenCalendarActivity extends Activity {
         mCalendarLayout=(LinearLayout)findViewById(R.id.calendar_layout);
         mCalendarLayout.addView(mWomenCalendarView);
     	
-        
+        /*
         mStartPeriod = (LinearLayout)findViewById(R.id.start_period);
         mStartPeriod.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -115,7 +115,7 @@ public class WomenCalendarActivity extends Activity {
                 startActivity(intent);
                 //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
             }
-        });        
+        });*/        
         
         
         mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
