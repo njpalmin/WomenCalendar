@@ -49,12 +49,6 @@ public class WomenCalendarDayActivity extends Activity {
 		mTime.set(millis);
 		updateTitle(mTime);
 		mCr = getContentResolver();
-		/*
-	    mWCDbAdapter = new WomenCalendarDbAdapter(this);
-        mWCDbAdapter.open();
-        
-        mCursor = mWCDbAdapter.getProfile();
-        mProfilePK = mCursor.getLong(mCursor.getColumnIndex(WomenCalendarDbAdapter.KEY_PK));*/
 		initView();
 	}
 	
@@ -66,9 +60,6 @@ public class WomenCalendarDayActivity extends Activity {
 				Log.d(TAG,"mStart onClick");
 				long millis = mTime.toMillis(true);
 				setIntentAndFinish(true, millis);
-				/*
-				mWCDbAdapter.open();
-				mWCDbAdapter.createRecord(mProfilePK, millis,Utils.RECORD_TYPE_PERIOD, millis);*/
 			}
 		});
 		
