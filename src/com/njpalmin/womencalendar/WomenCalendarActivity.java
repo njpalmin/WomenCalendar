@@ -4,19 +4,25 @@ import java.util.Calendar;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.njpalmin.womencalendar.WomenCalendar.Profile;
+import com.njpalmin.womencalendar.WomenCalendar.Record;
+
 public class WomenCalendarActivity extends Activity {
-	
+	private static final String TAG = "WomenCalendarActivity";
 	public static final int DAY_ACTIVITY_DETAILS = 1;
+	
 	private WomenCalendarView mWomenCalendarView;
     private int mStartDay;
     private ContentResolver mContentResolver;
@@ -28,10 +34,12 @@ public class WomenCalendarActivity extends Activity {
     private ImageView mNextMonthIV;
     private CalendarView mCalendarView;
     private LinearLayout mCalendarLayout;
-    private WomenCalendarDbAdapter mWCDbAdapter;
+    //private WomenCalendarDbAdapter mWCDbAdapter;
+    private WomenCalendarDatabaseHelper mHelper;
     private Cursor mCursor;
     private Time mStartedTime;
-    
+    private ContentResolver mCr;
+
     private static final int DAY_OF_WEEK_LABEL_IDS[] = {
         R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6
     };
@@ -83,16 +91,27 @@ public class WomenCalendarActivity extends Activity {
         TextView title = (TextView) findViewById(R.id.month_title);
         StringBuffer date = new StringBuffer(Utils.formatMonthYear(this, mTime));
         title.setText(date.toString());
-       
-        mWCDbAdapter = new WomenCalendarDbAdapter(this);
-        mWCDbAdapter.open();
         
-        mCursor = mWCDbAdapter.getProfile();
-        if(!mCursor.moveToFirst()){
-        	long rowid = mWCDbAdapter.createProfile(now/1000,Utils.CYCLE_LENGTH,Utils.PERIOD_LENGTH,Utils.LUTEAL_PHASE_LENGTH);
-        	mCursor.close();
+        mCr = getContentResolver();
+        
+        mCursor = mCr.query(Profile.CONTENT_URI,null,null,null,null);
+        if(mCursor == null || mCursor.getCount() == 0){
+        	Log.d(TAG,"mCursor == null");
+        	ContentValues values = new ContentValues();
+        	values.put(Profile.CYCLELENGTH,Utils.CYCLE_LENGTH);
+        	values.put(Profile.PERIODLENGTH,Utils.PERIOD_LENGTH);
+        	values.put(Profile.LASTACCESS,now/1000);
+        	values.put(Profile.LUTEALPHASELENGTH, 0);
+        	values.put(Profile.AUTOMATICFORECAST, 0);
+        	values.put(Profile.PILLNOTIFICATION, 0);
+        	values.put(Profile.PERIODNOTIFICATION, 0);
+        	values.put(Profile.PERIODNOTIFICATIONDAYSBEFORE, 0);
+        	values.put(Profile.PERIODNOTIFICATIONREPEAT, 0);
+        	values.put(Profile.OVULATIONNOTIFICATIONREPEAT, 0);
+            values.put(Profile.OVULATIONNOTIFICATIONDAYSBEFORE, 0); 
+            values.put(Profile.OVULATIONNOTIFICATION, 0);
+        	mCr.insert(Profile.CONTENT_URI,values);
         }
-        
         initView();
     }
     
@@ -107,16 +126,6 @@ public class WomenCalendarActivity extends Activity {
         mCalendarLayout=(LinearLayout)findViewById(R.id.calendar_layout);
         mCalendarLayout.addView(mWomenCalendarView);
     	
-        /*
-        mStartPeriod = (LinearLayout)findViewById(R.id.start_period);
-        mStartPeriod.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(WomenCalendarActivity.this, BMTChartActivity.class);
-                startActivity(intent);
-                //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
-            }
-        });*/        
-        
         
         mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
     	mBMTChartImageView.setOnClickListener(new View.OnClickListener() {
@@ -170,15 +179,19 @@ public class WomenCalendarActivity extends Activity {
     }    
     
     private Time getStartedTime(){
-    	Time started = new Time();
-    	
-    	mCursor.moveToFirst();
-    	
-    	long millis = mCursor.getLong(mCursor.getColumnIndex(WomenCalendarDbAdapter.KEY_LASTACCESS))* 1000;
-    	
-    	started.set(millis);
-    	started.normalize(true);
-    	
-    	return started;
+    	Time started;
+    	mCursor = mCr.query(Record.CONTENT_URI,null,null,null,null);
+
+    	if(mCursor != null && mCursor.getCount() != 0){
+    		started = new Time();
+    		long millis = mCursor.getLong(mCursor.getColumnIndex(Record.DATE))* 1000;
+        	started.set(millis);
+        	started.normalize(true);
+        	return started;
+    	}else{
+    		return null;
+    	}
     }
+    
+    
 }

@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 public class WomenCalendarView extends View {
 
@@ -55,6 +56,7 @@ public class WomenCalendarView extends View {
     private int mCellWidth;
     private boolean mLaunchDayView;
     
+   
     /**
      * The first Julian day of the current month.
      */
@@ -92,6 +94,11 @@ public class WomenCalendarView extends View {
     private int mMonthBgColor;
     private int mPressedColor;
 	
+    //LinearLayout
+    private LinearLayout mStartPeriod;
+    
+    
+    
     private int DAY_IN_MONTH = 1<<0;
     private int TODAY = 1<<1;
     
@@ -107,6 +114,8 @@ public class WomenCalendarView extends View {
     
 	public WomenCalendarView(WomenCalendarActivity activity, Time time, Time startedTime) {
 		super(activity);
+
+        
 		//mContext = activity;
 		// TODO Auto-generated constructor stub
 		//mWomenCalendarActivity = activity;
@@ -143,7 +152,9 @@ public class WomenCalendarView extends View {
 		
         long now = System.currentTimeMillis();
         
-        mStartedTime = startedTime;
+        if(startedTime != null){
+        	mStartedTime = startedTime;	
+        }
         
         mOtherViewCalendar = new Time();
         mTempTime = new Time();
@@ -172,6 +183,8 @@ public class WomenCalendarView extends View {
         mBusybitsColor = res.getColor(R.color.month_busybits);
         mMonthBgColor = res.getColor(R.color.month_bgcolor);
         mPressedColor = res.getColor(R.color.pressed);
+        
+      
         
         mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
         	@Override
@@ -572,6 +585,12 @@ public class WomenCalendarView extends View {
     
     private DayType getDayType(int day){
     	DayType dayType = DayType.NORMAL_DAY;
+    	
+    	if(mStartedTime == null){
+    		dayType = DayType.NORMAL_DAY;
+    		return dayType;
+    	}
+    	
         if( day == mStartedTime.monthDay &&  mCursor.getYear() == mStartedTime.year
                 && mCursor.getMonth() == mStartedTime.month) {
         	dayType = DayType.START_DAY;

@@ -13,7 +13,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <provider android:name="WomenCalendarProvider"
+     		android:authorities="com.njpalmin.womencalendar.provider"/>
+		
+			
         <activity android:name=".BMTChartActivity">
             <intent-filter>
 

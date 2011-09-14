@@ -1,7 +1,9 @@
 package com.njpalmin.womencalendar;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
@@ -17,7 +19,7 @@ public class WomenCalendarDayActivity extends Activity {
 	private Time mTime;
     private String mTitle;
     
-    private LinearLayout mStart;
+    private LinearLayout mStartPeriod;
     private ImageView mEnd;
     private ImageView mPill;
     private ImageView mBmt;
@@ -30,6 +32,10 @@ public class WomenCalendarDayActivity extends Activity {
     private Button mRemoveAll;
     private Button mBack;
     
+    //private WomenCalendarDbAdapter mWCDbAdapter;
+    private long mProfilePK;
+    private Cursor mCursor;
+    private ContentResolver mCr;
     
 	@Override
     public void onCreate(Bundle icicle) {
@@ -42,19 +48,27 @@ public class WomenCalendarDayActivity extends Activity {
 		mTime = new Time();
 		mTime.set(millis);
 		updateTitle(mTime);
-		
-		
+		mCr = getContentResolver();
+		/*
+	    mWCDbAdapter = new WomenCalendarDbAdapter(this);
+        mWCDbAdapter.open();
+        
+        mCursor = mWCDbAdapter.getProfile();
+        mProfilePK = mCursor.getLong(mCursor.getColumnIndex(WomenCalendarDbAdapter.KEY_PK));*/
 		initView();
 	}
 	
 	void initView(){
 		
-		mStart = (LinearLayout)findViewById(R.id.start_period);
-		mStart.setOnClickListener(new View.OnClickListener() {
+		mStartPeriod = (LinearLayout)findViewById(R.id.start_period);
+		mStartPeriod.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v){
 				Log.d(TAG,"mStart onClick");
 				long millis = mTime.toMillis(true);
 				setIntentAndFinish(true, millis);
+				/*
+				mWCDbAdapter.open();
+				mWCDbAdapter.createRecord(mProfilePK, millis,Utils.RECORD_TYPE_PERIOD, millis);*/
 			}
 		});
 		
@@ -82,6 +96,7 @@ public class WomenCalendarDayActivity extends Activity {
         intent.putExtra(Utils.EVENT_BEGIN_TIME, millis);
         setResult(WomenCalendarActivity.RESULT_OK, intent);
         if(finish) {
+        	//mWCDbAdapter.close();
             finish();
         }
     }    

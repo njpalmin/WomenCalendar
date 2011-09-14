@@ -14,6 +14,11 @@ public class Utils {
     public final static int CYCLE_LENGTH = 28;
     public final static int PERIOD_LENGTH = 4;
     
+    public final static String RECORD_TYPE_PERIOD="period";
+    public final static String RECORD_TYPE_TEMPERATURE="temperature";
+    public final static String RECORD_TYPE_WEIGHT="weight";
+    public final static String RECORD_TYPE_NOTE="note";
+    
     public static void startActivity(Context context, String className, long time) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
