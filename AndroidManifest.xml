@@ -22,7 +22,12 @@
 
             </intent-filter>
         </activity>
-               <activity android:name=".WomenCalendarDayActivity">
+		<activity android:name=".WomenCalendarDayActivity">
+            <intent-filter>
+
+            </intent-filter>
+        </activity>
+		<activity android:name=".WeightChartActivity">
             <intent-filter>
 
             </intent-filter>

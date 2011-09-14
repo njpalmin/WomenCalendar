@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 /**
  * An activity that encapsulates a graphical view of the chart.
  */
-public class BMTChartActivity extends Activity {
+public class WeightChartActivity extends Activity {
   /** The encapsulated graphical view. */
   private GraphicalView mView;
   XYMultipleSeriesDataset dataset = null;
@@ -52,15 +52,15 @@ public class BMTChartActivity extends Activity {
 	ImageView mWomenCalendarView = (ImageView)findViewById(R.id.top_calendar);
 	mWomenCalendarView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        Intent intent = new Intent(BMTChartActivity.this, WomenCalendarActivity.class);
+        Intent intent = new Intent(WeightChartActivity.this, WomenCalendarActivity.class);
         startActivity(intent);
       }
     });
 	
-	ImageView mWeightImageView = (ImageView)findViewById(R.id.top_weight_chart);
-	mWeightImageView.setOnClickListener(new View.OnClickListener() {
+	ImageView mBMTImageView = (ImageView)findViewById(R.id.top_bmt_chart);
+	mBMTImageView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        Intent intent = new Intent(BMTChartActivity.this, WeightChartActivity.class);
+        Intent intent = new Intent(WeightChartActivity.this, BMTChartActivity.class);
         startActivity(intent);
       }
     });
@@ -85,7 +85,7 @@ public class BMTChartActivity extends Activity {
 	      dates.get(i)[11] = new Date(108, 11, 17);
 	    }
 	    List<double[]> values = new ArrayList<double[]>();
-	    values.add(new double[] { 36.0, 37, 36.5, 37.5, 36, 36.0, 36.5, 36.5, 37.5, 37, 36.5, 36.5});
+	    values.add(new double[] { 49, 51, 50, 50, 49, 50, 50, 51, 52, 50, 51, 51});
 	    int[] colors = new int[] { Color.GREEN };
 	    PointStyle[] styles = new PointStyle[] { PointStyle.CIRCLE };
 	    renderer = buildRenderer(colors, styles);
@@ -100,7 +100,7 @@ public class BMTChartActivity extends Activity {
 	    setChartSettings(renderer, "Weather data", "Month", "Temperature",
 	    		dates.get(0)[0].getTime()/TimeSeries.DAY, 
 	    		dates.get(0)[5].getTime()/TimeSeries.DAY,
-	    		35, 38, Color.LTGRAY, Color.DKGRAY);
+	    		48, 53, Color.LTGRAY, Color.DKGRAY);
 
 	    renderer.setXLabels(36);
 	    renderer.setYLabels(7);
@@ -113,9 +113,9 @@ public class BMTChartActivity extends Activity {
 	    renderer.setLabelsTextSize(10);
 	    renderer.setMargins(new int[] { 0, 30, 30, 0 });
 	    renderer.setMarginsColor(Color.rgb(200, 174, 224));
-	    renderer.setPanLimits(new double[] { 0, Integer.MAX_VALUE, 35.5, 38.5 });
+	    renderer.setPanLimits(new double[] { 0, Integer.MAX_VALUE, 48, 53 });
 
-	    TimeSeries waterSeries = new TimeSeries("Water Temperature");
+	    /*TimeSeries waterSeries = new TimeSeries("Water Temperature");
 	    waterSeries.add(dates.get(0)[0], 40);
 	    waterSeries.add(dates.get(0)[1], 40);
 	    waterSeries.add(dates.get(0)[2], 40);
@@ -130,15 +130,15 @@ public class BMTChartActivity extends Activity {
 	    waterSeries.add(dates.get(0)[11], 40);
 	    renderer.setBarSpacing(0.1);
 	    XYSeriesRenderer waterRenderer = new XYSeriesRenderer();
-	    waterRenderer.setColor(Color.argb(250, 0, 210, 250));
+	    waterRenderer.setColor(Color.argb(250, 0, 210, 250));*/
 
 	    dataset = buildDateset(titles, dates, values);
-	    dataset.addSeries(0, waterSeries);
+	    /*dataset.addSeries(0, waterSeries);
 	    renderer.addSeriesRenderer(0, waterRenderer);
 	    waterRenderer.setDisplayChartValues(true);
-	    waterRenderer.setChartValuesTextSize(10);
+	    waterRenderer.setChartValuesTextSize(10);*/
 	    
-	    types = new String[] { BarChart.TYPE, LineChart.TYPE };
+	    types = new String[] { LineChart.TYPE };
   }
   
   /**

@@ -30,6 +30,7 @@ public class WomenCalendarActivity extends Activity {
     private Time mStartedPirodTime;
     private LinearLayout mStartPeriod;
     private ImageView mBMTChartImageView;
+    private ImageView mWeightChartImageView;
     private ImageView mPreMonthIV;
     private ImageView mNextMonthIV;
     private CalendarView mCalendarView;
@@ -95,6 +96,7 @@ public class WomenCalendarActivity extends Activity {
         mCr = getContentResolver();
         
         mCursor = mCr.query(Profile.CONTENT_URI,null,null,null,null);
+        
         if(mCursor == null || mCursor.getCount() == 0){
         	Log.d(TAG,"mCursor == null");
         	ContentValues values = new ContentValues();
@@ -131,6 +133,15 @@ public class WomenCalendarActivity extends Activity {
     	mBMTChartImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(WomenCalendarActivity.this, BMTChartActivity.class);
+                startActivity(intent);
+                //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
+            }
+        });
+    	
+    	mWeightChartImageView = (ImageView)findViewById(R.id.top_weight_chart);
+    	mWeightChartImageView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(WomenCalendarActivity.this, WeightChartActivity.class);
                 startActivity(intent);
                 //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
             }
@@ -184,7 +195,8 @@ public class WomenCalendarActivity extends Activity {
 
     	if(mCursor != null && mCursor.getCount() != 0){
     		started = new Time();
-    		long millis = mCursor.getLong(mCursor.getColumnIndex(Record.DATE))* 1000;
+    		mCursor.moveToFirst();
+    		long millis = mCursor.getLong(mCursor.getColumnIndex(Record.DATE));
         	started.set(millis);
         	started.normalize(true);
         	return started;
