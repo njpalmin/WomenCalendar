@@ -12,6 +12,7 @@
  	<string name="back_to_calendar">Back to calendar</string>
  	<string name="pill">Pill</string>
  	<string name="add">Add</string>
+ 	<string name="remove">Remove</string>
  	<string name="end_period">End\n Period</string>
  	<string name="start_period">Start\n Period</string>
  	<string name="day_cervical_mucus">Cervical\n Mucus</string>

@@ -166,7 +166,7 @@
 				android:layout_height="match_parent"
 				android:layout_weight="3.0">>
 				<TextView android:textColor="#FF000000"
-					android:id="@+id/pill_add"
+					android:id="@+id/day_start_period_add"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:gravity="right"
@@ -217,7 +217,7 @@
 				android:layout_height="match_parent"
 				android:layout_weight="3.0">>
 				<TextView android:textColor="#FF000000"
-					android:id="@+id/pill_add"
+					android:id="@+id/day_end_period_add"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:gravity="right"
@@ -233,7 +233,7 @@
 		<LinearLayout android:orientation="vertical"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:id="@+id/pill_container"
+			android:id="@+id/day_pill"
 			android:clickable = "true"
 			android:layout_weight="1.0"
 			android:background="@drawable/action_button_background">
@@ -268,7 +268,7 @@
 				android:layout_height="match_parent"
 				android:layout_weight="3.0">>
 				<TextView android:textColor="#FF000000"
-					android:id="@+id/pill_add"
+					android:id="@+id/day_pill_add"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:gravity="right"
@@ -451,7 +451,7 @@
 		<LinearLayout android:orientation="vertical"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:id="@+id/cervical_mucus"
+			android:id="@+id/day_cervical_mucus"
 			android:clickable = "true"
 			android:background="@drawable/action_button_background"
 			android:layout_weight="1.0">
@@ -459,7 +459,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1.0">
-				<ImageView android:id="@+id/cervical_mucus_image"
+				<ImageView android:id="@+id/day_cervical_mucus_image"
 					android:paddingTop="3.0dip"
 					android:paddingLeft="5.0dip"
 					android:duplicateParentState="true"

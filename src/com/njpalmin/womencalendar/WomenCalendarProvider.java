@@ -95,9 +95,39 @@ public class WomenCalendarProvider extends ContentProvider{
 	
 	
 	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
+	public int delete(Uri uri, String where, String[] whereArgs) {
 		// TODO Auto-generated method stub
-		return 0;
+		String table;
+		Uri contentUri;
+		
+		int match = sURLMatcher.match(uri);
+		switch (match){
+			case PROFILE:
+				table = TABLE_PROFILE;
+				contentUri = Profile.CONTENT_URI;
+				break;
+			case RECORD:
+				table = TABLE_RECORD;
+				contentUri = Record.CONTENT_URI;
+				break;
+			case CONFIG:
+				table = TABLE_CONFIG;
+				contentUri = Config.CONTENT_URI;
+				break;
+			case PRODUCT:
+				table = TABLE_PRODUCT;
+				contentUri = Product.CONTENT_URI;
+				break;
+			default:
+			    throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+		final SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		
+		int conunt = db.delete(table, where, whereArgs);
+		
+        getContext().getContentResolver().notifyChange(uri, null);
+        
+        return conunt;
 	}
 
 	@Override

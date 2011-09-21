@@ -20,6 +20,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.njpalmin.womencalendar.Utils.DayType;
+
 public class WomenCalendarView extends View {
 
 	final static public String TAG="WomenCalendarView";
@@ -102,15 +104,7 @@ public class WomenCalendarView extends View {
     private int DAY_IN_MONTH = 1<<0;
     private int TODAY = 1<<1;
     
-    private enum DayType{
-    	NORMAL_DAY,
-    	START_DAY,
-    	MIDDLE_DAY,
-    	END_DAY,
-    	FERTILITY_DAY,
-    	OVULATION_DAY,
-    	PERIOD_FORECAST_DAY
-    }
+
     
 	public WomenCalendarView(WomenCalendarActivity activity, Time time, Time startedTime) {
 		super(activity);
@@ -145,12 +139,12 @@ public class WomenCalendarView extends View {
 		InitView(activity, time, startedTime);
 	}
 
-	private void InitView(WomenCalendarActivity activity, Time time, Time startedTime){
+	public void InitView(WomenCalendarActivity activity, Time time, Time startedTime){
         setFocusable(true);
         setClickable(true);
 		mParentActivity = activity;
 		
-        long now = System.currentTimeMillis();
+        //long now = System.currentTimeMillis();
         
         if(startedTime != null){
         	mStartedTime = startedTime;	
@@ -246,11 +240,16 @@ public class WomenCalendarView extends View {
                     int y = (int) e.getY();
                     long millis = getSelectedMillisFor(x, y);
                     
+                    Time time = new Time();
+                    time.set(millis);
+                    
+                    
                     //Utils.startActivity(getContext(), WomenCalendarDayActivity.class, millis);
                     Intent intent = new Intent(getContext(), WomenCalendarDayActivity.class);
 
                     //intent.setClassName(getContext(), WomenCalendarDayActivity.class);
                     intent.putExtra(Utils.EVENT_BEGIN_TIME, millis);
+                    intent.putExtra(Utils.DAY_TYPE,getDayType(time.monthDay));
                     intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                     //getContext().startActivity(intent);
@@ -324,7 +323,7 @@ public class WomenCalendarView extends View {
 
         Paint p = new Paint();
         Rect r = mRect;
-        int columnDay1 = mCursor.getColumnOf(1);
+        int columnDay1 = mCursor.getColumnOf(0);
 
         // Get the Julian day for the date at row 0, column 0.
         int day = mFirstJulianDay - columnDay1;
@@ -393,7 +392,7 @@ public class WomenCalendarView extends View {
             drawSelection = mCursor.isSelected(row, column);
         }*/
 
-        DayType dayType = DayType.NORMAL_DAY;
+        int dayType = Utils.DAY_TYPE_NORMAL_DAY;
         boolean withinCurrentMonth = mCursor.isWithinCurrentMonth(row, column);
         
         
@@ -456,19 +455,19 @@ public class WomenCalendarView extends View {
         } else{
         	
         	switch (dayType){
-        		case START_DAY:
+        		case Utils.DAY_TYPE_START_DAY:
         			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.calendar_day_start_period_standard);
         			canvas.drawBitmap(bitmap, null,r, null);
         			break;
-        		case END_DAY:
+        		case Utils.DAY_TYPE_END_DAY:
         			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.calendar_day_end_period_standard);
         			canvas.drawBitmap(bitmap, null,r, null);
         			break;
-        		case MIDDLE_DAY:
+        		case Utils.DAY_TYPE_MIDDLE_DAY:
         			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.calendar_day_middle_period_standard);
         			canvas.drawBitmap(bitmap, null,r, null);
         			break;
-        		case FERTILITY_DAY:
+        		case Utils.DAY_TYPE_FERTILITY_DAY:
         			Log.d(TAG,"FERTILITY_DAY!");
         			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.calendar_day_standard);
         			Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.calendar_fertility);
@@ -583,34 +582,35 @@ public class WomenCalendarView extends View {
         return time.normalize(true);
     }
     
-    private DayType getDayType(int day){
-    	DayType dayType = DayType.NORMAL_DAY;
+    private int getDayType(int day){
+    	int dayType = Utils.DAY_TYPE_NORMAL_DAY;
+    	
     	
     	if(mStartedTime == null){
-    		dayType = DayType.NORMAL_DAY;
+    		dayType = Utils.DAY_TYPE_NORMAL_DAY;
     		return dayType;
     	}
     	
         if( day == mStartedTime.monthDay &&  mCursor.getYear() == mStartedTime.year
                 && mCursor.getMonth() == mStartedTime.month) {
-        	dayType = DayType.START_DAY;
+        	dayType =Utils.DAY_TYPE_START_DAY;
         }
         
         if((day - mStartedTime.monthDay) >= 0 && (day - mStartedTime.monthDay) <= (Utils.PERIOD_LENGTH -2)){
-        	dayType = DayType.MIDDLE_DAY;
+        	dayType = Utils.DAY_TYPE_MIDDLE_DAY;
         }
         
         if((day - mStartedTime.monthDay) == (Utils.PERIOD_LENGTH -1)){
-        	dayType = DayType.END_DAY;
+        	dayType = Utils.DAY_TYPE_END_DAY;
         }
         
         if((day - mStartedTime.monthDay >= Utils.calculateOvulationStartPeriod(Utils.CYCLE_LENGTH)) && 
            (day - mStartedTime.monthDay <= Utils.calculateOvulationEndPeriod(Utils.CYCLE_LENGTH))){
-           dayType = DayType.FERTILITY_DAY;
+           dayType = Utils.DAY_TYPE_FERTILITY_DAY;
         }
         
         
         return dayType;
-    	
     }
+    
 }

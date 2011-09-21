@@ -19,6 +19,6 @@
     <string name="weekday_day">%1$s %2$s</string>
     <!-- Order of month year label in month view -->
     <string name="month_year">%B %Y</string>
-    
+    <string name="date_format">%Y%m%d</string>
     <string name="date">%D </string>
 </resources>

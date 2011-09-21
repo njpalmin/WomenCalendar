@@ -1,5 +1,6 @@
 package com.njpalmin.womencalendar;
 
+import android.text.format.Time;
 import android.util.MonthDisplayHelper;
 
 public class DayOfMonthCursor extends MonthDisplayHelper {
@@ -154,4 +155,13 @@ public class DayOfMonthCursor extends MonthDisplayHelper {
         return true;
     }
    
+    public int getDateAt(int row, int column){
+    	Time time = new Time();
+    	int day = getDayAt(row, column);
+    	time.set(day,getMonth(),getYear());
+    	
+    	return Integer.parseInt(time.format("%Y%m%d"));
+    }
+    
+    
 }

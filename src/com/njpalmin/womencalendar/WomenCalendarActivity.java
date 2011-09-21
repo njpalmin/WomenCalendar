@@ -3,11 +3,16 @@ package com.njpalmin.womencalendar;
 import java.util.Calendar;
 
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.CallLog.Calls;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -22,10 +27,15 @@ import com.njpalmin.womencalendar.WomenCalendar.Record;
 public class WomenCalendarActivity extends Activity {
 	private static final String TAG = "WomenCalendarActivity";
 	public static final int DAY_ACTIVITY_DETAILS = 1;
+	private static final int QUERY_TOKEN = 53;
 	
 	private WomenCalendarView mWomenCalendarView;
+	private CalendarView mView;
     private int mStartDay;
     private ContentResolver mContentResolver;
+    private RecordObserver mRecordObserver = null;
+	//private CallLogObserver mCallLogObserver = null;
+	private Handler mHandler = new Handler();
     private Time mTime;
     private Time mStartedPirodTime;
     private LinearLayout mStartPeriod;
@@ -38,8 +48,10 @@ public class WomenCalendarActivity extends Activity {
     //private WomenCalendarDbAdapter mWCDbAdapter;
     private WomenCalendarDatabaseHelper mHelper;
     private Cursor mCursor;
-    private Time mStartedTime;
-    private ContentResolver mCr;
+    //private Time mStartedTime;
+    //private ContentResolver mCr;
+    //private WomenCalendarAdapter mAdapter;
+    private QueryHandler mQueryHandler;
 
     private static final int DAY_OF_WEEK_LABEL_IDS[] = {
         R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6
@@ -48,7 +60,16 @@ public class WomenCalendarActivity extends Activity {
         Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
         Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY
     };
-
+    
+    static final String[] RECORD_PROJECTION = new String[] {
+		Record._ID,
+		Record.PROFILEPK,
+		Record.DATE,
+		Record.TYPE,
+		Record.INTVALUE,
+		Record.FLOATVALUE,
+		Record.STRINGGVALUE,
+	};
     
     /** Called when the activity is first created. */
     @Override
@@ -93,9 +114,9 @@ public class WomenCalendarActivity extends Activity {
         StringBuffer date = new StringBuffer(Utils.formatMonthYear(this, mTime));
         title.setText(date.toString());
         
-        mCr = getContentResolver();
+        mContentResolver = getContentResolver();
         
-        mCursor = mCr.query(Profile.CONTENT_URI,null,null,null,null);
+        mCursor = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
         
         if(mCursor == null || mCursor.getCount() == 0){
         	Log.d(TAG,"mCursor == null");
@@ -112,21 +133,38 @@ public class WomenCalendarActivity extends Activity {
         	values.put(Profile.OVULATIONNOTIFICATIONREPEAT, 0);
             values.put(Profile.OVULATIONNOTIFICATIONDAYSBEFORE, 0); 
             values.put(Profile.OVULATIONNOTIFICATION, 0);
-        	mCr.insert(Profile.CONTENT_URI,values);
+            mContentResolver.insert(Profile.CONTENT_URI,values);
         }
+        
+        mRecordObserver = new RecordObserver(mHandler);
+        mQueryHandler = new QueryHandler(this);
+        registerRecordObserver();
         initView();
     }
+    
+    @Override
+	public void onDestroy(){
+		Log.d(TAG,"onDestroy");
+		super.onDestroy();
+		unregisterRecordObserver();
+	}
+    
     
     int getStartDay() {
         return mStartDay;
     }
     
     private void initView(){
-    	mStartedTime = getStartedTime();
+    	//mStartedTime = getStartedTime();
     	
-    	mWomenCalendarView = new WomenCalendarView(this, mTime ,mStartedTime);
-        mCalendarLayout=(LinearLayout)findViewById(R.id.calendar_layout);
-        mCalendarLayout.addView(mWomenCalendarView);
+    	//mAdapter = new WomenCalendarAdapter();
+    	
+    	//mWomenCalendarView = new WomenCalendarView(this, mTime ,mStartedTime);
+    	
+    	mCalendarLayout =(LinearLayout)findViewById(R.id.calendar_layout);
+        mView  = new CalendarView(this,mTime,mCalendarLayout);
+        //mWomenCalendarView.setAdapter(mAdapter);
+        //mCalendarLayout.addView(mView);
     	
         
         mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
@@ -175,23 +213,37 @@ public class WomenCalendarActivity extends Activity {
     public void goToMonth(Time time){
     	updateTitle(time);
     	//mCalendarLayout=(LinearLayout)findViewById(R.id.calendar_layout);
+    	/*
     	mCalendarLayout.removeView(mWomenCalendarView);
-    	mWomenCalendarView = new WomenCalendarView(this, time, mStartedTime);
-    	mCalendarLayout.addView(mWomenCalendarView);
-    	mWomenCalendarView.requestFocus();
+    	mView = new CalendarView(this, time, mCalendarLayout);
+    	mCalendarLayout.addView(mView);
+    	mView.requestFocus();*/
+    	mView.reDrawView(time);
+    	//mView.invalidate();
     }
-    
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
     	if(requestCode == DAY_ACTIVITY_DETAILS && resultCode ==RESULT_OK){
     		long millis = intent.getLongExtra(Utils.EVENT_BEGIN_TIME, 0);
-    		mTime.set(millis);
+    		/*
+    		String operate = intent.getStringExtra(Utils.DAY_TYPE);
+    		
+    		Time setTime = new Time();
+    		setTime.set(millis);
+    		
+    		if(mWomenCalendarView != null){
+    			mWomenCalendarView.invalidate();//InitView(this,mTime,setTime);
+    		}*/
     	}
     }    
     
     private Time getStartedTime(){
     	Time started;
-    	mCursor = mCr.query(Record.CONTENT_URI,null,null,null,null);
+    	mCursor = mContentResolver.query(Record.CONTENT_URI,null,null,null,null);
 
     	if(mCursor != null && mCursor.getCount() != 0){
     		started = new Time();
@@ -205,5 +257,62 @@ public class WomenCalendarActivity extends Activity {
     	}
     }
     
+    private class RecordObserver extends ContentObserver{
+
+		public RecordObserver(Handler handler) {
+			super(handler);
+			// TODO Auto-generated constructor stub
+		}
+		
+	    public void onChange(boolean selfChange){
+	        try{
+	            //Log.d(LOG_TAG, "Call log changed");
+	            super.onChange(selfChange);
+	            //mCallLog.setStatusToChanged();
+	            startQuery();
+	        }catch (Exception e){
+	            Log.e(TAG, e.toString());
+	        }
+	    }
+    };
     
+	private final class QueryHandler extends AsyncQueryHandler{
+
+		public QueryHandler(Context context) {
+			super(context.getContentResolver());
+			// TODO Auto-generated constructor stub
+		}
+		
+		@Override
+		protected void onQueryComplete(int token, Object cookie, Cursor cursor){
+			Log.d(TAG,"onQueryComplete");
+			if( cursor == null){
+				return;
+			} else {
+				//Calls call = new Calls();
+				cursor.moveToFirst();
+				Log.d(TAG,"id ="+cursor.getLong(cursor.getColumnIndex(Record._ID)));
+			}
+		}
+		
+	}
+	
+	private void registerRecordObserver(){
+		mContentResolver.registerContentObserver(Record.CONTENT_URI,true, mRecordObserver);
+	}
+	
+	private void unregisterRecordObserver(){
+		if(mRecordObserver != null){
+			mContentResolver.unregisterContentObserver(mRecordObserver);
+			mRecordObserver = null;
+		}
+	}
+	
+    private void startQuery() {
+    	Log.d(TAG,"startQuery");
+    	// Cancel any pending queries
+    	mQueryHandler.cancelOperation(QUERY_TOKEN);
+    	mQueryHandler.startQuery(QUERY_TOKEN, null, Record.CONTENT_URI,
+    			RECORD_PROJECTION, null, null, Record.DEFAULT_SORT_ORDER);
+    }
 }
