@@ -1,6 +1,8 @@
 package com.njpalmin.womencalendar;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +32,16 @@ public class Utils {
     public final static String RECORD_TYPE_WEIGHT = "weight";
     public final static String RECORD_TYPE_NOTE = "note";
     
+	public final static int DAY_TYPE_NORMAL = 1;
+	public final static int DAY_TYPE_START = 2;
+	public final static int DAY_TYPE_MIDDLE = 3;
+	public final static int DAY_TYPE_END = 4;
+	public final static int DAY_TYPE_FERTILITY = 5;
+	public final static int DAY_TYPE_OVULATION = 6;
     
+	public final static int DAY_IN_MILLIS = 86400000;
+	public final static int DAY_IN_SECONDS = DAY_IN_MILLIS / 1000;
+	
     public static enum DayType{
     	NORMAL_DAY,
     	START_DAY,
@@ -89,12 +100,26 @@ public class Utils {
         }
     }
     
-    public static int calculateOvulationStartPeriod(int cycleLength){
+    public static int calculateFertilityStartPeriod(int cycleLength){
     	return cycleLength - 18;
     }
     
-    public static int calculateOvulationEndPeriod(int cycleLength){
-    	return cycleLength - 11;
+    public static int calculateFertilityEndPeriod(int cycleLength){
+    	return cycleLength - 10;
+    }
+    
+    public static Time formatDateToTime(int date){
+    	String str = String.valueOf(date);
+    	Time time = new Time();
+    	
+    	int year = Integer.parseInt(str.substring(0,3));
+    	int month = Integer.parseInt(str.substring(4,5));
+    	int day = Integer.parseInt(str.substring(6,7));
+    	
+    	time.set(day,month,year);
+    	time.normalize(true);
+    	
+    	return time;
     }
     
     public static int getDaysOfMonth(Time time){

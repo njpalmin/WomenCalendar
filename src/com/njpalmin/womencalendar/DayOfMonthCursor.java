@@ -1,10 +1,11 @@
 package com.njpalmin.womencalendar;
 
 import android.text.format.Time;
+import android.util.Log;
 import android.util.MonthDisplayHelper;
 
 public class DayOfMonthCursor extends MonthDisplayHelper {
-
+	private final static String TAG="DayOfMonthCursor";
     private int mRow;
     private int mColumn;
     
@@ -156,8 +157,14 @@ public class DayOfMonthCursor extends MonthDisplayHelper {
     }
    
     public int getDateAt(int row, int column){
+
+    	
     	Time time = new Time();
     	int day = getDayAt(row, column);
+    	Log.d(TAG,"Row="+ row +" || Column="+ column + " || day="+ day + " || Month=" +getMonth() +" || Year="+ getYear());
+    	if(isWithinCurrentMonth(row,column)){
+    		Log.d(TAG,"within");
+    	}
     	time.set(day,getMonth(),getYear());
     	
     	return Integer.parseInt(time.format("%Y%m%d"));

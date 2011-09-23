@@ -604,8 +604,8 @@ public class WomenCalendarView extends View {
         	dayType = Utils.DAY_TYPE_END_DAY;
         }
         
-        if((day - mStartedTime.monthDay >= Utils.calculateOvulationStartPeriod(Utils.CYCLE_LENGTH)) && 
-           (day - mStartedTime.monthDay <= Utils.calculateOvulationEndPeriod(Utils.CYCLE_LENGTH))){
+        if((day - mStartedTime.monthDay >= Utils.calculateFertilityStartPeriod(Utils.CYCLE_LENGTH)) && 
+           (day - mStartedTime.monthDay <= Utils.calculateFertilityEndPeriod(Utils.CYCLE_LENGTH))){
            dayType = Utils.DAY_TYPE_FERTILITY_DAY;
         }
         

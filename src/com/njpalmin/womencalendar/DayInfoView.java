@@ -10,13 +10,17 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.njpalmin.womencalendar.WomenCalendar.Profile;
 import com.njpalmin.womencalendar.WomenCalendar.Record;
 
 public class DayInfoView extends RelativeLayout {
+	private final static String TAG="DayInfoView";
+	
 	private final static int RECORD_TYPE_START = 1<<0;
 	private final static int RECORD_TYPE_PILL = 1<<1;
 	private final static int RECORD_TYPE_BMT = 1<<2;
@@ -42,6 +46,7 @@ public class DayInfoView extends RelativeLayout {
 	private int mColumn = -1;
 	private int mRecordType = 0;
 	private String [] mRecordTypes;
+	private int mCycleLength;
 	private int mDayType;
 	
     private static final String[] RECORD_PROJECTION = new String[] {
@@ -53,13 +58,12 @@ public class DayInfoView extends RelativeLayout {
         Record.INTVALUE,        
     };
 	
-	
-	public DayInfoView(Context context, int row, int column, DayOfMonthCursor cursor ) {
+	public DayInfoView(Context context, int row, int column, DayOfMonthCursor cursor, int dayType) {
 		super(context);
 		
 		mRow = row;
 		mColumn = column;
-		
+		mDayType = dayType;
 		long now = System.currentTimeMillis();
 		mToday = new Time();
 		mToday.set(now);
@@ -78,39 +82,71 @@ public class DayInfoView extends RelativeLayout {
 		
 		mTime = new Time();
 		mTime.set(mDay,cursor.getMonth(),cursor.getYear());
+		mTime.monthDay = 7 * row + column - mCursor.getOffset() + 1;
 		mTime.normalize(true);
+		
 		mMillis = mTime.toMillis(true);
 		
 		mWithinCurrentMonth = mCursor.isWithinCurrentMonth(row, column);
+
 		if (mDay == mToday.monthDay && mCursor.getYear() == mToday.year
                 && mCursor.getMonth() == mToday.month) {
 			mIsToday = true;
         }
 		
 		mContentResolver = mContext.getContentResolver();
-		mDate = mCursor.getDateAt(row,column);
-		/*
-		String selection = Record.DATE + "='" + String.valueOf(mDate) + "'";
-		Cursor c = mContentResolver.query(Record.CONTENT_URI,RECORD_PROJECTION,selection,null,null);
-		*/
+		mDate = Integer.parseInt(mTime.format("%Y%m%d"));
 		
 		initView();
 	}
 	
 	private void initView(){
 		mDayInfoLayout = new  RelativeLayout(mContext);
+		mDayInfoLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 
+																	   RelativeLayout.LayoutParams.MATCH_PARENT));
 		
 		if(mWithinCurrentMonth){
 			mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_standard);
 		}else{
 			mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_other_standard);
 		}
-		if(isWithinPeriod(mDate)){
-			mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_middle_period_standard);
+		
+		switch (mDayType){
+			case Utils.DAY_TYPE_START:
+				mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_start_period_standard);
+				break;
+			case Utils.DAY_TYPE_MIDDLE:
+				mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_middle_period_standard);
+				break;
+			case Utils.DAY_TYPE_END:
+				mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_end_period_standard);
+				break;
+			
+			case Utils.DAY_TYPE_FERTILITY:
+				ImageView fertilityDay = new ImageView(mContext);
+				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+																					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+				params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+				params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+				fertilityDay.setLayoutParams(params);
+				fertilityDay.setBackgroundResource(R.drawable.calendar_fertility);
+				mDayInfoLayout.addView(fertilityDay);
+				break;
+				
+			case Utils.DAY_TYPE_OVULATION:
+				ImageView ovulationDay = new ImageView(mContext);
+				RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+						 RelativeLayout.LayoutParams.WRAP_CONTENT);
+				params1.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+				params1.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+				ovulationDay.setLayoutParams(params1);
+				ovulationDay.setBackgroundResource(R.drawable.calendar_ovulation);
+				mDayInfoLayout.addView(ovulationDay);
+				break;
+			case Utils.DAY_TYPE_NORMAL:
+				default:
+					break;
 		}
-		
-		mDayInfoLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-		
 		
 		mDateTV  = new TextView(mContext);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -170,28 +206,14 @@ public class DayInfoView extends RelativeLayout {
 					mRecordType |= RECORD_TYPE_NOTE;
 				}else if (mRecordTypes[i].equals(Utils.RECORD_TYPE_START)){
 					mRecordType |= RECORD_TYPE_START;
-					mDayType = Utils.DAY_TYPE_FORECAST_DAY;
+					//mDayType = Utils.DAY_TYPE_FORECAST_DAY;
 				}else if (mRecordTypes[i].equals(Utils.RECORD_TYPE_END)){
 					mRecordType &= RECORD_TYPE_START;
 				}
 			}
     	}
     }
-	
-    private boolean isWithinPeriod(int date){
-    	String selection = Record.DATE + "<?";
-    	Log.d("Alpha","selection= "+selection);
-    	
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,RECORD_PROJECTION,selection,new String[]{String.valueOf(date)},null);
-    	Log.d("Alpha","count = "+ c.getCount());
-    	
-    	if(c.getCount() == 0){
-    		return false;
-    	}else{
-    		return true;
-    	}
-    }
-	
+    
 	@Override
 	protected void onDraw(Canvas canvas){
 		mCanvas = canvas;

@@ -1,6 +1,7 @@
 package com.njpalmin.womencalendar;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.AsyncQueryHandler;
@@ -12,7 +13,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.CallLog.Calls;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -37,6 +37,7 @@ public class WomenCalendarActivity extends Activity {
 	//private CallLogObserver mCallLogObserver = null;
 	private Handler mHandler = new Handler();
     private Time mTime;
+    private Date mDate;
     private Time mStartedPirodTime;
     private LinearLayout mStartPeriod;
     private ImageView mBMTChartImageView;
@@ -82,19 +83,23 @@ public class WomenCalendarActivity extends Activity {
 
         setRequestedOrientation(LinearLayout.VERTICAL);
         mStartDay = Calendar.getInstance().getFirstDayOfWeek();
+        
+       
         long now = System.currentTimeMillis();
 
         mTime = new Time();
         mTime.set(now);
+        mTime.set(mTime.monthDay,mTime.month,mTime.year);
         mTime.normalize(true);
-        
+       
         // Get first day of week based on locale and populate the day headers
         mStartDay = Calendar.getInstance().getFirstDayOfWeek();
         int diff = mStartDay - Calendar.SUNDAY - 1;
+        /*
         final int startDay = Utils.getFirstDayOfWeek();
         final int sundayColor = getResources().getColor(R.color.sunday_text_color);
         final int saturdayColor = getResources().getColor(R.color.saturday_text_color);
-
+         */
         for (int day = 0; day < 7; day++) {
             final String dayString = DateUtils.getDayOfWeekString(
                     (DAY_OF_WEEK_KINDS[day] + diff) % 7 + 1, DateUtils.LENGTH_MEDIUM);
@@ -124,7 +129,7 @@ public class WomenCalendarActivity extends Activity {
         	values.put(Profile.CYCLELENGTH,Utils.CYCLE_LENGTH);
         	values.put(Profile.PERIODLENGTH,Utils.PERIOD_LENGTH);
         	values.put(Profile.LASTACCESS,now/1000);
-        	values.put(Profile.LUTEALPHASELENGTH, 0);
+        	values.put(Profile.LUTEALPHASELENGTH, 14);
         	values.put(Profile.AUTOMATICFORECAST, 0);
         	values.put(Profile.PILLNOTIFICATION, 0);
         	values.put(Profile.PERIODNOTIFICATION, 0);
@@ -269,7 +274,8 @@ public class WomenCalendarActivity extends Activity {
 	            //Log.d(LOG_TAG, "Call log changed");
 	            super.onChange(selfChange);
 	            //mCallLog.setStatusToChanged();
-	            startQuery();
+	            //startQuery();
+	            mView.reDrawView(mTime);
 	        }catch (Exception e){
 	            Log.e(TAG, e.toString());
 	        }

@@ -74,7 +74,8 @@ public class WomenCalendarDayActivity extends Activity {
 		
 		
 		setContentView(R.layout.womencalendarday_main);
-	
+		setRequestedOrientation(LinearLayout.VERTICAL);
+		
 		mRow = getIntent().getIntExtra(Utils.EVENT_ROW,-1);
 		mColumn = getIntent().getIntExtra(Utils.EVENT_COLUMN,-1);
 		
@@ -100,7 +101,7 @@ public class WomenCalendarDayActivity extends Activity {
 	
 	void initView(){
 		mDate = Integer.parseInt(mTime.format(getString(R.string.date_format)));
-		
+		/*
 		if(initHeaderView()){
 			TextView noParameters = (TextView)findViewById(R.id.no_parameters_label_view);
 			if(noParameters != null){
@@ -117,7 +118,7 @@ public class WomenCalendarDayActivity extends Activity {
 			default:
 				break;
 		}
-		
+		*/
     	mPreMonthIV = (ImageView)findViewById(R.id.prev);
     	mPreMonthIV.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -145,17 +146,20 @@ public class WomenCalendarDayActivity extends Activity {
 				mCursor = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
 		        if(mCursor != null){
 					long profilePk = -1;
-					int cycleLength =0;
+					
 					mCursor.moveToFirst();
 					profilePk = mCursor.getLong(mCursor.getColumnIndex(Profile._ID));
-					cycleLength = mCursor.getInt(mCursor.getColumnIndex(Profile.CYCLELENGTH));
-		        
+					int periodLength = mCursor.getInt(mCursor.getColumnIndex(Profile.PERIODLENGTH));
+					Time endTime = new Time(mTime);
+					endTime.monthDay += periodLength;
+					endTime.normalize(true);
+					
 					if(profilePk > 0){
 						ContentValues values = new ContentValues();
 						values.put(Record.PROFILEPK, profilePk);
-						values.put(Record.DATE, mDate);
+						values.put(Record.DATE, mTime.toMillis(true)/1000);
 						values.put(Record.TYPE, Utils.RECORD_TYPE_START);
-						values.put(Record.INTVALUE, cycleLength);
+						values.put(Record.INTVALUE, (periodLength * Utils.DAY_IN_SECONDS)/*Integer.parseInt(endTime.format(getString(R.string.date_format)))*/);
 						mContentResolver.insert(Record.CONTENT_URI,values);
 					}
 		        }

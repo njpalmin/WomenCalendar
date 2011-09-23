@@ -33,7 +33,8 @@ public final class WomenCalendar {
 	public static final class Record implements BaseColumns {
 	    private Record(){}
 	    
-	    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/record");
+
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/record");
 	    
 	    //public static final String PK = "pk";
         public static final String PROFILEPK = "profilepk"; 
@@ -43,7 +44,7 @@ public final class WomenCalendar {
         public static final String STRINGGVALUE = "stringvalue";
         public static final String INTVALUE = "intvalue";
         
-        public static final String DEFAULT_SORT_ORDER = "type DESC";
+        public static final String DEFAULT_SORT_ORDER = "date ASC";
  
 	}   
 	
