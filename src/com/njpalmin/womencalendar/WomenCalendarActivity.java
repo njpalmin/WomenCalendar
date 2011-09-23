@@ -28,30 +28,21 @@ public class WomenCalendarActivity extends Activity {
 	private static final String TAG = "WomenCalendarActivity";
 	public static final int DAY_ACTIVITY_DETAILS = 1;
 	private static final int QUERY_TOKEN = 53;
-	
-	private WomenCalendarView mWomenCalendarView;
-	private CalendarView mView;
+
+	private WomenCalendarView mView;
     private int mStartDay;
     private ContentResolver mContentResolver;
     private RecordObserver mRecordObserver = null;
 	//private CallLogObserver mCallLogObserver = null;
 	private Handler mHandler = new Handler();
     private Time mTime;
-    private Date mDate;
-    private Time mStartedPirodTime;
-    private LinearLayout mStartPeriod;
     private ImageView mBMTChartImageView;
     private ImageView mWeightChartImageView;
     private ImageView mPreMonthIV;
     private ImageView mNextMonthIV;
-    private CalendarView mCalendarView;
     private LinearLayout mCalendarLayout;
-    //private WomenCalendarDbAdapter mWCDbAdapter;
-    private WomenCalendarDatabaseHelper mHelper;
     private Cursor mCursor;
-    //private Time mStartedTime;
-    //private ContentResolver mCr;
-    //private WomenCalendarAdapter mAdapter;
+
     private QueryHandler mQueryHandler;
 
     private static final int DAY_OF_WEEK_LABEL_IDS[] = {
@@ -69,7 +60,7 @@ public class WomenCalendarActivity extends Activity {
 		Record.TYPE,
 		Record.INTVALUE,
 		Record.FLOATVALUE,
-		Record.STRINGGVALUE,
+		Record.STRINGVALUE,
 	};
     
     /** Called when the activity is first created. */
@@ -160,17 +151,10 @@ public class WomenCalendarActivity extends Activity {
     }
     
     private void initView(){
-    	//mStartedTime = getStartedTime();
-    	
-    	//mAdapter = new WomenCalendarAdapter();
-    	
-    	//mWomenCalendarView = new WomenCalendarView(this, mTime ,mStartedTime);
-    	
+   	
     	mCalendarLayout =(LinearLayout)findViewById(R.id.calendar_layout);
-        mView  = new CalendarView(this,mTime,mCalendarLayout);
-        //mWomenCalendarView.setAdapter(mAdapter);
-        //mCalendarLayout.addView(mView);
-    	
+        mView  = new WomenCalendarView(this,mTime,mCalendarLayout);
+   	
         
         mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
     	mBMTChartImageView.setOnClickListener(new View.OnClickListener() {
@@ -217,14 +201,7 @@ public class WomenCalendarActivity extends Activity {
     
     public void goToMonth(Time time){
     	updateTitle(time);
-    	//mCalendarLayout=(LinearLayout)findViewById(R.id.calendar_layout);
-    	/*
-    	mCalendarLayout.removeView(mWomenCalendarView);
-    	mView = new CalendarView(this, time, mCalendarLayout);
-    	mCalendarLayout.addView(mView);
-    	mView.requestFocus();*/
-    	mView.reDrawView(time);
-    	//mView.invalidate();
+      	mView.reDrawView(time);
     }
     /*
      * (non-Javadoc)
@@ -245,22 +222,6 @@ public class WomenCalendarActivity extends Activity {
     		}*/
     	}
     }    
-    
-    private Time getStartedTime(){
-    	Time started;
-    	mCursor = mContentResolver.query(Record.CONTENT_URI,null,null,null,null);
-
-    	if(mCursor != null && mCursor.getCount() != 0){
-    		started = new Time();
-    		mCursor.moveToFirst();
-    		long millis = mCursor.getLong(mCursor.getColumnIndex(Record.DATE));
-        	started.set(millis);
-        	started.normalize(true);
-        	return started;
-    	}else{
-    		return null;
-    	}
-    }
     
     private class RecordObserver extends ContentObserver{
 
@@ -313,12 +274,5 @@ public class WomenCalendarActivity extends Activity {
 			mRecordObserver = null;
 		}
 	}
-	
-    private void startQuery() {
-    	Log.d(TAG,"startQuery");
-    	// Cancel any pending queries
-    	mQueryHandler.cancelOperation(QUERY_TOKEN);
-    	mQueryHandler.startQuery(QUERY_TOKEN, null, Record.CONTENT_URI,
-    			RECORD_PROJECTION, null, null, Record.DEFAULT_SORT_ORDER);
-    }
+
 }

@@ -13,7 +13,9 @@ public class Utils {
     private static final String TAG = "CalUtils";
     
     public static final String EVENT_BEGIN_TIME = "beginTime";
-    public static final String DAY_TYPE = "dayType";
+    public static final String EVENT_DAY_TYPE = "dayType";
+    public static final String EVENT_NOTIFICATION = "notification";
+    
     public static final String EVENT_ROW = "row";
     public static final String EVENT_COLUMN = "column";
     public static final String OPERATION ="operation";
@@ -39,6 +41,13 @@ public class Utils {
 	public final static int DAY_TYPE_FERTILITY = 5;
 	public final static int DAY_TYPE_OVULATION = 6;
     
+	public final static int NOTIFICATION_TYPE_START = 1<<0;
+	public final static int NOTIFICATION_TYPE_PILL = 1<<1;
+	public final static int NOTIFICATION_TYPE_BMT = 1<<2;
+	public final static int NOTIFICATION_TYPE_NOTE = 1<<3;
+	public final static int NOTIFICATION_TYPE_SEX = 1<<4;
+	public final static int NOTIFICATION_TYPE_WEIGHT = 1<<5;
+	
 	public final static int DAY_IN_MILLIS = 86400000;
 	public final static int DAY_IN_SECONDS = DAY_IN_MILLIS / 1000;
 	

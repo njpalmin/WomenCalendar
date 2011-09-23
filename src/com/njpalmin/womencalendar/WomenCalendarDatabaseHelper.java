@@ -99,7 +99,7 @@ public class WomenCalendarDatabaseHelper  extends SQLiteOpenHelper{
     													Record.DATE + " INTEGER NOT NULL," + 
     													Record.TYPE + " TEXT NOT NULL," + 
     													Record.FLOATVALUE + " REAL," +
-    													Record.STRINGGVALUE + " TEXT," + 
+    													Record.STRINGVALUE + " TEXT," + 
     													Record.INTVALUE + " INTEGER);"; 
     /*
     public static final String[] PROFILE_PROJECTION = new String[] {

@@ -452,7 +452,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:id="@+id/day_cervical_mucus"
-			android:clickable = "true"
+			android:clickable = "false"
 			android:background="@drawable/action_button_background"
 			android:layout_weight="1.0">
 			<LinearLayout android:orientation="horizontal"
@@ -504,7 +504,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:id="@+id/day_mood"
-			android:clickable = "true"
+			android:clickable = "false"
 			android:background="@drawable/action_button_background"
 			android:layout_weight="1.0">
 			<LinearLayout android:orientation="horizontal"

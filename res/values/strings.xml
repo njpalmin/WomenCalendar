@@ -13,6 +13,7 @@
  	<string name="pill">Pill</string>
  	<string name="add">Add</string>
  	<string name="remove">Remove</string>
+ 	<string name="remove_edit">Remove/Edit</string>
  	<string name="end_period">End\n Period</string>
  	<string name="start_period">Start\n Period</string>
  	<string name="day_cervical_mucus">Cervical\n Mucus</string>

@@ -73,7 +73,7 @@ public class WomenCalendarProvider extends ContentProvider{
         sRecordProjectionMap.put(Record.DATE, Record.DATE);
         sRecordProjectionMap.put(Record.TYPE, Record.TYPE);
         sRecordProjectionMap.put(Record.FLOATVALUE, Record.FLOATVALUE);
-        sRecordProjectionMap.put(Record.STRINGGVALUE, Record.STRINGGVALUE);
+        sRecordProjectionMap.put(Record.STRINGVALUE, Record.STRINGVALUE);
         sRecordProjectionMap.put(Record.INTVALUE, Record.INTVALUE);
         
         sConfigProjectionMap = new HashMap<String,String>();

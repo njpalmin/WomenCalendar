@@ -30,7 +30,7 @@ public class DayInfoView extends RelativeLayout {
 	
 	private Time mToday;
 	private Time mTime;
-	private Long mMillis;
+	private long mMillis;
 	private RelativeLayout mDayInfoLayout;
 	private TextView mDateTV;
 	private Context mContext;
@@ -46,24 +46,26 @@ public class DayInfoView extends RelativeLayout {
 	private int mColumn = -1;
 	private int mRecordType = 0;
 	private String [] mRecordTypes;
-	private int mCycleLength;
 	private int mDayType;
+	private int mNotification;
 	
     private static final String[] RECORD_PROJECTION = new String[] {
         Record._ID, 
         Record.DATE,
         Record.TYPE,
         Record.FLOATVALUE,
-        Record.STRINGGVALUE,
+        Record.STRINGVALUE,
         Record.INTVALUE,        
     };
 	
-	public DayInfoView(Context context, int row, int column, DayOfMonthCursor cursor, int dayType) {
+	public DayInfoView(Context context, int row, int column, DayOfMonthCursor cursor, int dayType, int notification) {
 		super(context);
 		
 		mRow = row;
 		mColumn = column;
 		mDayType = dayType;
+		mNotification = notification;
+		
 		long now = System.currentTimeMillis();
 		mToday = new Time();
 		mToday.set(now);
@@ -148,6 +150,65 @@ public class DayInfoView extends RelativeLayout {
 					break;
 		}
 		
+		if((mNotification & Utils.NOTIFICATION_TYPE_PILL) != 0){
+			ImageView pill = new ImageView(mContext);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+			params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+			pill.setLayoutParams(params);
+			pill.setBackgroundResource(R.drawable.calendar_pill);
+			mDayInfoLayout.addView(pill);
+		}
+		
+		if((mNotification & Utils.NOTIFICATION_TYPE_SEX) != 0){
+			ImageView sex = new ImageView(mContext);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+			params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+			sex.setLayoutParams(params);
+			sex.setBackgroundResource(R.drawable.calendar_sex);
+			mDayInfoLayout.addView(sex);
+		}		
+		
+		if((mNotification & Utils.NOTIFICATION_TYPE_NOTE) != 0){
+			ImageView note = new ImageView(mContext);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+			note.setLayoutParams(params);
+			note.setBackgroundResource(R.drawable.calendar_note);
+			mDayInfoLayout.addView(note);
+		}
+		
+		if((mNotification & Utils.NOTIFICATION_TYPE_BMT) != 0){
+			TextView bmt = new TextView(mContext);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+			params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			bmt.setLayoutParams(params);
+			bmt.setText(String.valueOf(getBmtValue()));
+			bmt.setTextSize(6);
+			bmt.setTextColor(Color.GRAY);
+			mDayInfoLayout.addView(bmt);
+		}
+		
+		if((mNotification & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
+			TextView weight = new TextView(mContext);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					 RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+			params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+			weight.setLayoutParams(params);
+			weight.setText(String.valueOf(getWeightValue()));
+			weight.setTextSize(6);
+			weight.setTextColor(Color.GRAY);
+			mDayInfoLayout.addView(weight);
+		}
+		
+		
 		mDateTV  = new TextView(mContext);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
 		        								RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -214,6 +275,31 @@ public class DayInfoView extends RelativeLayout {
     	}
     }
     
+    private float getWeightValue(){
+    	float weightValue = 0.0f;
+    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_WEIGHT + " AND " + Record.FLOATVALUE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	if(c != null){
+    		c.moveToFirst();
+    		weightValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		c.close();
+    	}
+    	
+    	return weightValue;
+    }
+ 
+    private float getBmtValue(){
+    	float bmtValue = 0.0f;
+    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_BMT + " AND " + Record.FLOATVALUE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	if(c != null){
+    		c.moveToFirst();
+    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		c.close();
+    	}
+    	
+    	return bmtValue;
+    }
 	@Override
 	protected void onDraw(Canvas canvas){
 		mCanvas = canvas;
@@ -229,5 +315,13 @@ public class DayInfoView extends RelativeLayout {
 
 	public long getMillis() {
 		return mMillis;
+	}
+	
+	public int getDayType() {
+		return mDayType;
+	}
+
+	public int getNotification() {
+		return mNotification;
 	}
 }
