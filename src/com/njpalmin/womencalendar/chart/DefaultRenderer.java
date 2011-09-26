@@ -59,7 +59,11 @@ public class DefaultRenderer implements Serializable {
    * when not enough space.
    */
   private boolean mInScroll;
-
+  /**
+   * 
+   */
+  private String yLabelSuffix = "";
+   
   /**
    * Adds a simple renderer to the multiple renderer.
    * 
@@ -417,4 +421,11 @@ public class DefaultRenderer implements Serializable {
     mInScroll = inScroll;
   }
 
+  public String getYlabelSuffix() {
+	return yLabelSuffix;
+  }
+  
+  public void setYlabelSuffix(String suffix) {
+	  yLabelSuffix = suffix;
+  }
 }

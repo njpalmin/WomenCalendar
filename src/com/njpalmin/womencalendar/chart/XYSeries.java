@@ -10,8 +10,6 @@ import java.util.List;
  * scatter... charts.
  */
 public class XYSeries implements Serializable {
-  /** The series title. */
-  private String mTitle;
   /** A list to contain the values for the X axis. */
   private List<Double> mX = new ArrayList<Double>();
   /** A list to contain the values for the Y axis. */
@@ -34,8 +32,8 @@ public class XYSeries implements Serializable {
    * 
    * @param title the series title.
    */
-  public XYSeries(String title) {
-    this(title, 0);
+  public XYSeries() {
+    this(0);
   }
 
   /**
@@ -44,8 +42,7 @@ public class XYSeries implements Serializable {
    * @param title the series title.
    * @param scaleNumber the series scale number
    */
-  public XYSeries(String title, int scaleNumber) {
-    mTitle = title;
+  public XYSeries(int scaleNumber) {
     mScaleNumber = scaleNumber;
     initRange();
   }
@@ -81,24 +78,6 @@ public class XYSeries implements Serializable {
     mMaxX = Math.max(mMaxX, x);
     mMinY = Math.min(mMinY, y);
     mMaxY = Math.max(mMaxY, y);
-  }
-
-  /**
-   * Returns the series title.
-   * 
-   * @return the series title
-   */
-  public String getTitle() {
-    return mTitle;
-  }
-
-  /**
-   * Sets the series title.
-   * 
-   * @param title the series title
-   */
-  public void setTitle(String title) {
-    mTitle = title;
   }
 
   /**

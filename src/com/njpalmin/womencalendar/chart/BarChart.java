@@ -1,5 +1,9 @@
 package com.njpalmin.womencalendar.chart;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -222,4 +226,65 @@ public class BarChart extends XYChart {
   public String getChartType() {
     return TYPE;
   }
+  
+  /**
+   * The graphical representation of the labels on the X axis.
+   * 
+   * @param xLabels the X labels values
+   * @param xTextLabelLocations the X text label locations
+   * @param canvas the canvas to paint to
+   * @param paint the paint to be used for drawing
+   * @param left the left value of the labels area
+   * @param top the top value of the labels area
+   * @param bottom the bottom value of the labels area
+   * @param xPixelsPerUnit the amount of pixels per one unit in the chart labels
+   * @param minX the minimum value on the X axis in the chart
+   * @param maxX the maximum value on the X axis in the chart
+   */
+  protected void drawXLabels(List<Double> xLabels, Double[] xTextLabelLocations, Canvas canvas,
+      Paint paint, int left, int top, int bottom, double xPixelsPerUnit, double minX, double maxX) {
+    int length = xLabels.size();
+    int[] margins = mRenderer.getMargins();
+    boolean showLabels = mRenderer.isShowLabels();
+    boolean showGrid = mRenderer.isShowGrid();
+    Calendar calendar = Calendar.getInstance();
+    int dayOfMonth;
+    float textSize = paint.getTextSize();
+    SimpleDateFormat dayFormat = null;
+    SimpleDateFormat monthFormat = null;
+    try {
+      dayFormat = new SimpleDateFormat("d");
+      monthFormat = new SimpleDateFormat("MM-yyyy");
+    } catch (Exception e) {
+      // do nothing here
+    }
+    for (int i = 0; i < length; i++) {
+      double label = xLabels.get(i);
+      float xLabel = (float) (left + xPixelsPerUnit * (label - minX));
+      calendar.setTimeInMillis((long)(label * TimeSeries.DAY));
+      dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+      if (showGrid) {
+        paint.setColor(mRenderer.getGridColor());
+        paint.setStrokeWidth((float)(0.5));
+        if ((dayOfMonth == 1) || (dayOfMonth % 5== 0)) {
+          paint.setColor(Color.BLACK);
+          paint.setStrokeWidth(1);
+        }
+        canvas.drawLine(xLabel, bottom + margins[2], xLabel, top, paint);
+      }
+      if (showLabels && ((dayOfMonth == 1) || (dayOfMonth % 5 == 0))) {
+        paint.setColor(mRenderer.getLabelsColor());
+        drawText(canvas, dayFormat.format(calendar.getTime()), xLabel, bottom + margins[1] - mRenderer.getLabelsTextSize() / 3,
+            paint, mRenderer.getXLabelsAngle());
+        if (dayOfMonth == 1) {        
+          paint.setTextSize(textSize + 1);
+          drawText(canvas, monthFormat.format(calendar.getTime()), xLabel + mRenderer.getLabelsTextSize() / 3,
+        		  top + mRenderer.getLabelsTextSize() * 4 / 3, paint, mRenderer.getXLabelsAngle());
+          paint.setTextSize(textSize);
+        }
+      }
+    }
+    drawXTextLabels(xTextLabelLocations, canvas, paint, showLabels, left, top, bottom, xPixelsPerUnit, minX, maxX);
+  }
+  
 }

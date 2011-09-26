@@ -2,11 +2,11 @@ package com.njpalmin.womencalendar.chart;
 
 import java.util.List;
 
-import com.njpalmin.womencalendar.chart.XYMultipleSeriesRenderer.Orientation;
-
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+
+import com.njpalmin.womencalendar.chart.XYMultipleSeriesRenderer.Orientation;
 
 /**
  * The combined XY chart rendering class.
@@ -17,7 +17,9 @@ public class CombinedXYChart extends XYChart {
   /** The embedded XY charts. */
   private XYChart[] mCharts;
   /** The supported charts for being combined. */
-  private Class[] xyChartTypes = new Class[] { LineChart.class, BarChart.class, CubicLineChart.class };
+  private Class[] xyChartTypes = new Class[] { LineChart.class, BarChart.class };
+  /** .*/
+  private int defSeriesIndex = 0;
 
   /**
    * Builds a new combined XY chart instance.
@@ -42,25 +44,7 @@ public class CombinedXYChart extends XYChart {
       } else {
         XYMultipleSeriesDataset newDataset = new XYMultipleSeriesDataset();
         newDataset.addSeries(dataset.getSeriesAt(i));
-        XYMultipleSeriesRenderer newRenderer = new XYMultipleSeriesRenderer();
-        
-        newRenderer.setBarSpacing(renderer.getBarSpacing());
-        newRenderer.setPointSize(renderer.getPointSize());
-        int scale = dataset.getSeriesAt(i).getScaleNumber();
-        if (renderer.isMinXSet(scale)) {
-          newRenderer.setXAxisMin(renderer.getXAxisMin(scale));
-        }
-        if (renderer.isMaxXSet(scale)) {
-          newRenderer.setXAxisMax(renderer.getXAxisMax(scale));
-        }
-        if (renderer.isMinYSet(scale)) {
-          newRenderer.setYAxisMin(renderer.getYAxisMin(scale));
-        }
-        if (renderer.isMaxYSet(scale)) {
-          newRenderer.setYAxisMax(renderer.getYAxisMax(scale));
-        }
-        newRenderer.addSeriesRenderer(renderer.getSeriesRendererAt(i));
-        mCharts[i].setDatasetRenderer(newDataset, newRenderer);
+        mCharts[i].setDatasetRenderer(newDataset, renderer);
       }
     }
   }
@@ -125,5 +109,28 @@ public class CombinedXYChart extends XYChart {
    */
   public String getChartType() {
     return TYPE;
+  }
+  
+  /**
+   * The graphical representation of the labels on the X axis.
+   * 
+   * @param xLabels the X labels values
+   * @param xTextLabelLocations the X text label locations
+   * @param canvas the canvas to paint to
+   * @param paint the paint to be used for drawing
+   * @param left the left value of the labels area
+   * @param top the top value of the labels area
+   * @param bottom the bottom value of the labels area
+   * @param xPixelsPerUnit the amount of pixels per one unit in the chart labels
+   * @param minX the minimum value on the X axis in the chart
+   * @param maxX the maximum value on the X axis in the chart
+   */
+  protected void drawXLabels(List<Double> xLabels, Double[] xTextLabelLocations, Canvas canvas,
+      Paint paint, int left, int top, int bottom, double xPixelsPerUnit, double minX, double maxX) {
+	  mCharts[defSeriesIndex].drawXLabels(xLabels, xTextLabelLocations, canvas, paint, left, top, bottom, xPixelsPerUnit, minX, maxX);
+  }
+  
+  public void setDefSeriesIndex(int index) {
+	  defSeriesIndex = index;
   }
 }

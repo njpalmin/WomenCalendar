@@ -1,16 +1,13 @@
 package com.njpalmin.womencalendar.chart;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
@@ -311,11 +308,11 @@ public abstract class XYChart extends AbstractChart {
               paint.setColor(mRenderer.getLabelsColor());
               if (axisAlign == Align.LEFT) {
                 //canvas.drawLine(left + getLabelLinePos(axisAlign), yLabel, left, yLabel, paint);            
-                drawText(canvas, getLabel(label), left - margins[1], yLabel - 2, paint, mRenderer
+                drawText(canvas, getLabel(label) + mRenderer.getYlabelSuffix(), left - margins[1], yLabel - 2, paint, mRenderer
                     .getYLabelsAngle());
               } else {
                 //canvas.drawLine(right, yLabel, right + getLabelLinePos(axisAlign), yLabel, paint);
-                drawText(canvas, getLabel(label), right, yLabel - 2, paint, mRenderer
+                drawText(canvas, getLabel(label) + mRenderer.getYlabelSuffix(), right, yLabel - 2, paint, mRenderer
                     .getYLabelsAngle());
               }
             }
@@ -497,48 +494,24 @@ public abstract class XYChart extends AbstractChart {
    */
   protected void drawXLabels(List<Double> xLabels, Double[] xTextLabelLocations, Canvas canvas,
       Paint paint, int left, int top, int bottom, double xPixelsPerUnit, double minX, double maxX) {
-    int length = xLabels.size();
-    int[] margins = mRenderer.getMargins();
-    boolean showLabels = mRenderer.isShowLabels();
-    boolean showGrid = mRenderer.isShowGrid();
-    Calendar calendar = Calendar.getInstance();
-    int dayOfMonth;
-    SimpleDateFormat dayFormat = null;
-    SimpleDateFormat monthFormat = null;
-    try {
-      dayFormat = new SimpleDateFormat("d");
-      monthFormat = new SimpleDateFormat("MM-yyyy");
-    } catch (Exception e) {
-      // do nothing here
-    }
-    for (int i = 0; i < length; i++) {
-      double label = xLabels.get(i);
-      float xLabel = (float) (left + xPixelsPerUnit * (label - minX));
-      calendar.setTimeInMillis((long)(label * TimeSeries.DAY));
-      dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-      if (showGrid) {
-        paint.setColor(mRenderer.getGridColor());
-        paint.setStrokeWidth((float)(0.5));
-        if ((dayOfMonth == 1) || (dayOfMonth % 5== 0)) {
-          paint.setColor(Color.BLACK);
-          paint.setStrokeWidth(1);
-        }
-        canvas.drawLine(xLabel, bottom + margins[2], xLabel, top, paint);
-      }
-      if (showLabels && ((dayOfMonth == 1) || (dayOfMonth % 5 == 0))) {
-        //canvas.drawLine(xLabel, bottom, xLabel, bottom + mRenderer.getLabelsTextSize(), paint);
-        paint.setColor(mRenderer.getLabelsColor());
-        drawText(canvas, dayFormat.format(calendar.getTime()), xLabel, bottom + margins[1] - mRenderer.getLabelsTextSize() / 3,
-            paint, mRenderer.getXLabelsAngle());
-        //drawText(canvas, getLabel(label), xLabel, bottom + mRenderer.getLabelsTextSize() * 4 / 3,
-        //    paint, mRenderer.getXLabelsAngle());
-        if (dayOfMonth == 1) {
-          drawText(canvas, monthFormat.format(calendar.getTime()), xLabel + mRenderer.getLabelsTextSize() / 3,
-        		  top + mRenderer.getLabelsTextSize() * 4 / 3, paint, mRenderer.getXLabelsAngle());
-        }
-      }
-    }
-    drawXTextLabels(xTextLabelLocations, canvas, paint, showLabels, left, top, bottom, xPixelsPerUnit, minX, maxX);
+	  int length = xLabels.size();
+	    boolean showLabels = mRenderer.isShowLabels();
+	    boolean showGrid = mRenderer.isShowGrid();
+	    for (int i = 0; i < length; i++) {
+	      double label = xLabels.get(i);
+	      float xLabel = (float) (left + xPixelsPerUnit * (label - minX));
+	      if (showLabels) {
+	        paint.setColor(mRenderer.getLabelsColor());
+	        canvas.drawLine(xLabel, bottom, xLabel, bottom + mRenderer.getLabelsTextSize() / 3, paint);
+	        drawText(canvas, getLabel(label), xLabel, bottom + mRenderer.getLabelsTextSize() * 4 / 3,
+	            paint, mRenderer.getXLabelsAngle());
+	      }
+	      if (showGrid) {
+	        paint.setColor(mRenderer.getGridColor());
+	        canvas.drawLine(xLabel, bottom, xLabel, top, paint);
+	      }
+	    }
+	    drawXTextLabels(xTextLabelLocations, canvas, paint, showLabels, left, top, bottom, xPixelsPerUnit, minX, maxX);
   }
   
   /**

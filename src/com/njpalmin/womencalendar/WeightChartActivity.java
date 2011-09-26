@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.njpalmin.womencalendar.chart.BarChart;
+import com.njpalmin.womencalendar.WomenCalendar.Record;
 import com.njpalmin.womencalendar.chart.CombinedXYChart;
 import com.njpalmin.womencalendar.chart.GraphicalView;
 import com.njpalmin.womencalendar.chart.LineChart;
@@ -12,14 +12,14 @@ import com.njpalmin.womencalendar.chart.PointStyle;
 import com.njpalmin.womencalendar.chart.TimeSeries;
 import com.njpalmin.womencalendar.chart.XYMultipleSeriesDataset;
 import com.njpalmin.womencalendar.chart.XYMultipleSeriesRenderer;
-import com.njpalmin.womencalendar.chart.XYSeries;
 import com.njpalmin.womencalendar.chart.XYSeriesRenderer;
 
-import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
-import android.os.Bundle;
+import android.text.format.Time;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,28 +27,26 @@ import android.widget.LinearLayout;
 /**
  * An activity that encapsulates a graphical view of the chart.
  */
-public class WeightChartActivity extends Activity {
+public class WeightChartActivity extends AbstractImplChart {
+  private final static double WEIGHT_MIN_VALUE = 48.0;
+  private final static double WEIGHT_MAX_VALUE = 53.0;
+  private final static int XLABELS_NUMBER = 36;
+  private final static int YLABELS_NUMBER = 7;
+  private final static double WEIGHT_INVALID_VALUE = -1.0;
+  
   /** The encapsulated graphical view. */
   private GraphicalView mView;
-  XYMultipleSeriesDataset dataset = null;
-  XYMultipleSeriesRenderer renderer = null;
-  String[] types = null;
+  private XYMultipleSeriesDataset dataset = null;
+  private XYMultipleSeriesRenderer renderer = null;
+  private String[] types = new String[] { LineChart.TYPE };
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    
-    setContentView(R.layout.bmtchart_main);
-    
-    initView();
-    initDebugCombineData();
-    CombinedXYChart bmtChart = new CombinedXYChart(dataset, renderer, types);
-    mView = new GraphicalView(this, bmtChart);
-    LinearLayout chartLayout = (LinearLayout)findViewById(R.id.chart_layout);
-    chartLayout.addView(mView);
-  }
   
-  private void initView(){
+  void initView(){
+	CombinedXYChart bmtChart = new CombinedXYChart(dataset, renderer, types);
+	mView = new GraphicalView(this, bmtChart);
+	LinearLayout chartLayout = (LinearLayout)findViewById(R.id.chart_layout);
+	chartLayout.addView(mView);
+	    
 	ImageView mWomenCalendarView = (ImageView)findViewById(R.id.top_calendar);
 	mWomenCalendarView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
@@ -66,30 +64,10 @@ public class WeightChartActivity extends Activity {
     });
   }
   
-  private void initDebugCombineData() {
-	    String[] titles = new String[] { "Crete Air Temperature" };
-	    List<Date[]> dates = new ArrayList<Date[]>();
-	    for (int i = 0; i < titles.length; i++) {
-	      dates.add(new Date[12]);
-	      dates.get(i)[0] = new Date(108, 9, 1);
-	      dates.get(i)[1] = new Date(108, 9, 8);
-	      dates.get(i)[2] = new Date(108, 9, 15);
-	      dates.get(i)[3] = new Date(108, 9, 22);
-	      dates.get(i)[4] = new Date(108, 9, 29);
-	      dates.get(i)[5] = new Date(108, 10, 5);
-	      dates.get(i)[6] = new Date(108, 10, 12);
-	      dates.get(i)[7] = new Date(108, 10, 19);
-	      dates.get(i)[8] = new Date(108, 10, 26);
-	      dates.get(i)[9] = new Date(108, 11, 3);
-	      dates.get(i)[10] = new Date(108, 11, 10);
-	      dates.get(i)[11] = new Date(108, 11, 17);
-	    }
-	    List<double[]> values = new ArrayList<double[]>();
-	    values.add(new double[] { 49, 51, 50, 50, 49, 50, 50, 51, 52, 50, 51, 51});
-	    int[] colors = new int[] { Color.GREEN };
+  void initData() {
+	  int[] colors = new int[] { Color.rgb(137, 0, 235) };
 	    PointStyle[] styles = new PointStyle[] { PointStyle.CIRCLE };
 	    renderer = buildRenderer(colors, styles);
-	    renderer.setPointSize(5.5f);
 	    int length = renderer.getSeriesRendererCount();
 
 	    for (int i = 0; i < length; i++) {
@@ -97,13 +75,10 @@ public class WeightChartActivity extends Activity {
 	      r.setLineWidth(2);
 	      r.setFillPoints(true);
 	    }
-	    setChartSettings(renderer, "Weather data", "Month", "Temperature",
-	    		dates.get(0)[0].getTime()/TimeSeries.DAY, 
-	    		dates.get(0)[5].getTime()/TimeSeries.DAY,
-	    		48, 53, Color.LTGRAY, Color.DKGRAY);
-
-	    renderer.setXLabels(36);
-	    renderer.setYLabels(7);
+	    
+	    renderer.setPointSize((float)3.5);
+	  renderer.setXLabels(XLABELS_NUMBER);
+	    renderer.setYLabels(YLABELS_NUMBER);
 	    renderer.setShowGrid(true);
 	    renderer.setXLabelsAlign(Align.LEFT);
 	    renderer.setYLabelsAlign(Align.LEFT);  
@@ -113,147 +88,52 @@ public class WeightChartActivity extends Activity {
 	    renderer.setLabelsTextSize(10);
 	    renderer.setMargins(new int[] { 0, 30, 30, 0 });
 	    renderer.setMarginsColor(Color.rgb(200, 174, 224));
-	    renderer.setPanLimits(new double[] { 0, Integer.MAX_VALUE, 48, 53 });
-
-	    /*TimeSeries waterSeries = new TimeSeries("Water Temperature");
-	    waterSeries.add(dates.get(0)[0], 40);
-	    waterSeries.add(dates.get(0)[1], 40);
-	    waterSeries.add(dates.get(0)[2], 40);
-	    waterSeries.add(dates.get(0)[3], 40);
-	    waterSeries.add(dates.get(0)[4], 40);
-	    waterSeries.add(dates.get(0)[5], 40);
-	    waterSeries.add(dates.get(0)[6], 40);
-	    waterSeries.add(dates.get(0)[7], 40);
-	    waterSeries.add(dates.get(0)[8], 40);
-	    waterSeries.add(dates.get(0)[9], 40);
-	    waterSeries.add(dates.get(0)[10], 40);
-	    waterSeries.add(dates.get(0)[11], 40);
-	    renderer.setBarSpacing(0.1);
-	    XYSeriesRenderer waterRenderer = new XYSeriesRenderer();
-	    waterRenderer.setColor(Color.argb(250, 0, 210, 250));*/
-
-	    dataset = buildDateset(titles, dates, values);
-	    /*dataset.addSeries(0, waterSeries);
-	    renderer.addSeriesRenderer(0, waterRenderer);
-	    waterRenderer.setDisplayChartValues(true);
-	    waterRenderer.setChartValuesTextSize(10);*/
+	    renderer.setPanLimits(new double[] { 0, Integer.MAX_VALUE, WEIGHT_MIN_VALUE, WEIGHT_MAX_VALUE });
+	    renderer.setYlabelSuffix("kg");
 	    
-	    types = new String[] { LineChart.TYPE };
-  }
-  
-  /**
-   * Builds an XY multiple dataset using the provided values.
-   * 
-   * @param titles the series titles
-   * @param xValues the values for the X axis
-   * @param yValues the values for the Y axis
-   * @return the XY multiple dataset
-   */
-  private XYMultipleSeriesDataset buildDataset(String[] titles, List<double[]> xValues,
-      List<double[]> yValues) {
-    XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-    addXYSeries(dataset, titles, xValues, yValues, 0);
-    return dataset;
-  }
+	    int dataCount = 0;
+    	int count = 0;
+    	Time time = new Time();
+    	List<Date[]> dates = new ArrayList<Date[]>();
+    	List<double[]> values = new ArrayList<double[]>();
+    	
+	    ContentResolver resolver = getContentResolver();
+	    Cursor cursor = 
+	    	resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_WEIGHT + "'", null, Record.DATE + " ASC");
+	    
+	    try {    	
+	    	if (cursor != null) count = cursor.getCount();
+	    	if (count != 0) {
+	    		dates.add(new Date[count]);
+	    		values.add(new double[count]);
+	    		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+	    			time.set(((long)cursor.getInt(cursor.getColumnIndex(Record.DATE))) * 1000);
+	    			dates.get(0)[dataCount] = new Date(time.year - 1900, time.month, time.monthDay);
+	    			values.get(0)[dataCount] = cursor.getFloat(cursor.getColumnIndex(Record.FLOATVALUE));
+	    			
+	    			dataCount++;
+	    		}
+	    	}
+	    } finally {
+	    	if (cursor == null || count == 0 || dataCount == 0) {
+	    		dates.clear();
+	    		values.clear();		
+	    		dates.add(new Date[1]);
+	    		values.add(new double[1]);
+	    		
+	    		time.setToNow();
+	    		dates.get(0)[0] = new Date(time.year - 1900, time.month, time.monthDay);
+	    		values.get(0)[0] = WEIGHT_INVALID_VALUE;
+	    	}
+	    	
+	    	setChartSettings(renderer, dates.get(0)[0].getTime()/TimeSeries.DAY, 
+		    		dates.get(0)[0].getTime()/TimeSeries.DAY + XLABELS_NUMBER,
+		    		WEIGHT_MIN_VALUE, WEIGHT_MAX_VALUE, Color.LTGRAY, Color.DKGRAY);
 
-  /**
-   * Builds an XY multiple dataset using the provided values.
-   * 
-   * @param titles the series titles
-   * @param xValues the values for the X axis
-   * @param yValues the values for the Y axis
-   * @return the XY multiple dataset
-   */
-  private XYMultipleSeriesDataset buildDateset(String[] titles, List<Date[]> dateValues,
-      List<double[]> yValues) {
-    XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-    addTimeSeries(dataset, titles, dateValues, yValues, 0);
-    return dataset;
-  }
-  
-  private void addXYSeries(XYMultipleSeriesDataset dataset, String[] titles, List<double[]> xValues,
-      List<double[]> yValues, int scale) {
-    int length = titles.length;
-    for (int i = 0; i < length; i++) {
-      XYSeries series = new XYSeries(titles[i], scale);
-      double[] xV = xValues.get(i);
-      double[] yV = yValues.get(i);
-      int seriesLength = xV.length;
-      for (int k = 0; k < seriesLength; k++) {
-        series.add(xV[k], yV[k]);
-      }
-      dataset.addSeries(series);
-    }
-  }
-  
-  private void addTimeSeries(XYMultipleSeriesDataset dataset, String[] titles, List<Date[]> dateValues,
-	      List<double[]> yValues, int scale) {
-	    int length = titles.length;
-	    for (int i = 0; i < length; i++) {
-	      TimeSeries series = new TimeSeries(titles[i]);
-	      Date[] dateV = dateValues.get(i);
-	      double[] yV = yValues.get(i);
-	      int seriesLength = dateV.length;
-	      for (int k = 0; k < seriesLength; k++) {
-	        series.add(dateV[k], yV[k]);
-	      }
-	      dataset.addSeries(series);
+		    dataset = buildDateset(dates, null, values);
+	    	if (cursor != null) cursor.close();
 	    }
-	  }
-  /**
-   * Sets a few of the series renderer settings.
-   * 
-   * @param renderer the renderer to set the properties to
-   * @param title the chart title
-   * @param xTitle the title for the X axis
-   * @param yTitle the title for the Y axis
-   * @param xMin the minimum value on the X axis
-   * @param xMax the maximum value on the X axis
-   * @param yMin the minimum value on the Y axis
-   * @param yMax the maximum value on the Y axis
-   * @param axesColor the axes color
-   * @param labelsColor the labels color
-   */
-  protected void setChartSettings(XYMultipleSeriesRenderer renderer, String title, String xTitle,
-      String yTitle, double xMin, double xMax, double yMin, double yMax, int axesColor,
-      int labelsColor) {
-    renderer.setXAxisMin(xMin);
-    renderer.setXAxisMax(xMax);
-    renderer.setYAxisMin(yMin);
-    renderer.setYAxisMax(yMax);
-    renderer.setAxesColor(axesColor);
-    renderer.setLabelsColor(labelsColor);
-  }
-  
-  /**
-   * Builds an XY multiple series renderer.
-   * 
-   * @param colors the series rendering colors
-   * @param styles the series point styles
-   * @return the XY multiple series renderers
-   */
-  private XYMultipleSeriesRenderer buildRenderer(int[] colors, PointStyle[] styles) {
-    XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-    setRenderer(renderer, colors, styles);
-    return renderer;
   }
 
-  private void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors, PointStyle[] styles) {
-    renderer.setAxisTitleTextSize(16);
-    renderer.setLabelsTextSize(15);
-    renderer.setPointSize(5f);
-    renderer.setMargins(new int[] { 0, 30, 20, 0 });
-    renderer.setMarginsColor(Color.rgb(200, 174, 224));
-    renderer.setGridColor(Color.GRAY);
-    renderer.setApplyBackgroundColor(true);
-    renderer.setBackgroundColor(Color.WHITE);
-    int length = colors.length;
-    for (int i = 0; i < length; i++) {
-      XYSeriesRenderer r = new XYSeriesRenderer();
-      r.setColor(colors[i]);
-      r.setPointStyle(styles[i]);
-      renderer.addSeriesRenderer(r);
-    }
-  }
 }
 
