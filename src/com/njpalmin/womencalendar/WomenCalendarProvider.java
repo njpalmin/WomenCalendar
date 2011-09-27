@@ -123,11 +123,11 @@ public class WomenCalendarProvider extends ContentProvider{
 		}
 		final SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		
-		int conunt = db.delete(table, where, whereArgs);
+		int count = db.delete(table, where, whereArgs);
 		
         getContext().getContentResolver().notifyChange(uri, null);
         
-        return conunt;
+        return count;
 	}
 
 	@Override
@@ -231,9 +231,38 @@ public class WomenCalendarProvider extends ContentProvider{
 	}
 
 	@Override
-	public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
+	public int update(Uri uri, ContentValues contentValues, String where, String[] whereArgs) {
 		// TODO Auto-generated method stub
-		return 0;
+		
+		String table;
+		Uri contentUri;
+		int match = sURLMatcher.match(uri);
+		switch (match){
+			case PROFILE:
+				table = TABLE_PROFILE;
+				contentUri = Profile.CONTENT_URI;
+				break;
+			case RECORD:
+				table = TABLE_RECORD;
+				contentUri = Record.CONTENT_URI;
+				break;
+			case CONFIG:
+				table = TABLE_CONFIG;
+				contentUri = Config.CONTENT_URI;
+				break;
+			case PRODUCT:
+				table = TABLE_PRODUCT;
+				contentUri = Product.CONTENT_URI;
+				break;
+			default:
+			    throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        
+        int count = db.update(table,contentValues,where, whereArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
+        
+        return count;
 	}
 
 }

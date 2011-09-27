@@ -52,6 +52,7 @@ public class WeightChartActivity extends AbstractImplChart {
       public void onClick(View v) {
         Intent intent = new Intent(WeightChartActivity.this, WomenCalendarActivity.class);
         startActivity(intent);
+        finish();
       }
     });
 	
@@ -60,6 +61,7 @@ public class WeightChartActivity extends AbstractImplChart {
       public void onClick(View v) {
         Intent intent = new Intent(WeightChartActivity.this, BMTChartActivity.class);
         startActivity(intent);
+        finish();
       }
     });
   }

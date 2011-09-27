@@ -21,4 +21,8 @@
     <string name="month_year">%B %Y</string>
     <string name="date_format">%Y%m%d</string>
     <string name="date">%D </string>
+    <string name="celsius_symbol">ºC</string>
+    <string name="fahrenheit_symbol">ºF</string>
+	<string name="default_value_in_fahrenheit">97.70</string>
+ 	<string name="default_value_in_celsius">36.50</string>
 </resources>

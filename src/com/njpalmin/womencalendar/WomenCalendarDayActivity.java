@@ -1,40 +1,45 @@
 package com.njpalmin.womencalendar;
 
-import java.util.Date;
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.InputFilter.LengthFilter;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
-import com.njpalmin.womencalendar.Utils.DayType;
+import com.njpalmin.womencalendar.WomenCalendar.Config;
 import com.njpalmin.womencalendar.WomenCalendar.Profile;
 import com.njpalmin.womencalendar.WomenCalendar.Record;
 
 public class WomenCalendarDayActivity extends Activity {
 	private final static String TAG="WomenCalendarDayActivity";
-	
-	private final static int RECORD_TYPE_START = 1<<0;
-	private final static int RECORD_TYPE_PILL = 1<<1;
-	private final static int RECORD_TYPE_BMT = 1<<2;
-	private final static int RECORD_TYPE_NOTE = 1<<3;
-	private final static int RECORD_TYPE_SEX = 1<<4;
-	private final static int RECORD_TYPE_WEIGHT = 1<<5;
-	
-	private int mRecordType = 0;
+
+    private static final int DIALOG_ADD_BMT = 1;
+    private static final int DIALOG_REMOVE_BMT = 2;
+    private static final int DIALOG_ADD_NOTE = 3;
+    private static final int DIALOG_REMOVE_NOTE = 4;
+    private static final int DIALOG_ADD_WEIGHT = 5;
+    private static final int DIALOG_REMOVE_WEIGHT = 6;
+    
+    
 	private Time mTime;
-	private int mDate;
-    private String mTitle;
-    private String [] mRecordTypes;
     private int mDayType;
     private int mNotification;
 	private int mPeriodLength;
@@ -55,11 +60,17 @@ public class WomenCalendarDayActivity extends Activity {
     private LinearLayout mMood;
     private LinearLayout mWeight;
     
+    private AlertDialog mBmtDialog;
+    private AlertDialog mNoteDialog;
+    private AlertDialog mWeightDialog;
+    
     private Button mRemoveAll;
     private Button mBack;
     private boolean mHasRecord = false;
-    
-    
+    private String mTemperatureScale;
+    private String mWeightScale;
+    private String mLocalTemperatureScale;
+    private String mLocalWeightScale;
     
     //private WomenCalendarDbAdapter mWCDbAdapter;
     private Cursor mCursor;
@@ -99,13 +110,15 @@ public class WomenCalendarDayActivity extends Activity {
 			mCursor.close();
 		}
 		getCycleAndPeriodLength();
+		getConfig();
 		initView();
 	}
 	
 	void initView(){
 		initHeaderView();
-		mDate = Integer.parseInt(mTime.format(getString(R.string.date_format)));
 		/*
+		mDate = Integer.parseInt(mTime.format(getString(R.string.date_format)));
+		
 		if(initHeaderView()){
 			TextView noParameters = (TextView)findViewById(R.id.no_parameters_label_view);
 			if(noParameters != null){
@@ -214,6 +227,13 @@ public class WomenCalendarDayActivity extends Activity {
 		mBmt.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//finish();
+            	long millis = mTime.toMillis(true);
+            	if((mNotification & Utils.NOTIFICATION_TYPE_BMT) != 0){
+            		showDialog(DIALOG_REMOVE_BMT);
+            	}else {
+            		showDialog(DIALOG_ADD_BMT);
+            	}
+            	//setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);  
             }
         });
 		
@@ -221,6 +241,11 @@ public class WomenCalendarDayActivity extends Activity {
 		mNote.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//finish();
+            	if((mNotification & Utils.NOTIFICATION_TYPE_NOTE) != 0){
+            		showDialog(DIALOG_REMOVE_NOTE);
+            	}else{
+            		showDialog(DIALOG_ADD_NOTE);
+            	}
             }
         });
 		
@@ -260,6 +285,11 @@ public class WomenCalendarDayActivity extends Activity {
 		mWeight.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//finish();
+            	if((mNotification & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
+            		showDialog(DIALOG_REMOVE_WEIGHT);
+            	}else{
+            		showDialog(DIALOG_ADD_WEIGHT);
+            	}
             }
         });
 		
@@ -295,6 +325,8 @@ public class WomenCalendarDayActivity extends Activity {
     		dayInfoLayout.removeAllViews();
     		dayInfoLayout.setVisibility(View.VISIBLE);
     		
+    		TextView paramsDescription = (TextView)findViewById(R.id.parameter_description_text_view);
+    		TextView noParameter = (TextView)findViewById(R.id.no_parameters_label_view);
     		
     		switch (mDayType){
     			case Utils.DAY_TYPE_START_DAY:
@@ -314,7 +346,18 @@ public class WomenCalendarDayActivity extends Activity {
     	    		ImageView fertilityDay = new ImageView(this);
     	    		fertilityDay.setImageResource(R.drawable.day_fertility);
     	    		dayInfoLayout.addView(fertilityDay);
+    	    		paramsDescription.setVisibility(View.VISIBLE);
+    	    		paramsDescription.setText(getString(R.string.fertility_forecast));
+    	    		noParameter.setVisibility(View.GONE);
     	    	break;
+    			case Utils.DAY_TYPE_OVULATION_DAY:
+    	    		ImageView ovulationDay = new ImageView(this);
+    	    		ovulationDay.setImageResource(R.drawable.day_ovulation);
+    	    		dayInfoLayout.addView(ovulationDay);
+    	    		paramsDescription.setVisibility(View.VISIBLE);
+    	    		paramsDescription.setText(getString(R.string.ovulation_forecast));
+    	    		noParameter.setVisibility(View.GONE);
+    				break;
     			case Utils.DAY_TYPE_FORECAST_DAY:
     	    		ImageView forecastDay = new ImageView(this);
     	    		forecastDay.setImageResource(R.drawable.day_start_period_forecast);
@@ -362,7 +405,7 @@ public class WomenCalendarDayActivity extends Activity {
 	    		TextView noteAdd = (TextView)findViewById(R.id.day_note_add);
 	    		noteAdd.setText(getString(R.string.remove_edit));
 	    		
-	    		TextView noParameter = (TextView)findViewById(R.id.no_parameters_label_view);
+
 	    		noParameter.setVisibility(View.GONE); 
 	    		
 	    		LinearLayout noteLayout = (LinearLayout)findViewById(R.id.note_layout);
@@ -376,11 +419,14 @@ public class WomenCalendarDayActivity extends Activity {
     
     private float getBmtValue(){
     	float bmtValue = 0.0f;
-    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_BMT + " AND " + Record.FLOATVALUE + "=?";
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
+    									new String[]{Utils.RECORD_TYPE_BMT ,String.valueOf(mMillis/1000)},null);
     	if(c != null){
-    		c.moveToFirst();
-    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		if(c.getCount() != 0){
+	    		c.moveToFirst();
+	    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		}
     		c.close();
     	}
     	
@@ -389,8 +435,9 @@ public class WomenCalendarDayActivity extends Activity {
  
     private float getWeightValue(){
     	float weightValue = 0.0f;
-    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_WEIGHT + " AND " + Record.FLOATVALUE + "=?";
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
+    									new String[]{Utils.RECORD_TYPE_WEIGHT,String.valueOf(mMillis/1000)},null);
     	if(c != null){
     		c.moveToFirst();
     		weightValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
@@ -402,8 +449,9 @@ public class WomenCalendarDayActivity extends Activity {
     
     private String getNoteValue(){
     	String noteValue = "";
-    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_NOTE + " AND " + Record.STRINGVALUE + "=?";
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
+    									 new String[]{Utils.RECORD_TYPE_NOTE,String.valueOf(mMillis/1000)},null);
     	if(c != null){
     		c.moveToFirst();
     		noteValue = c.getString(c.getColumnIndex(Record.STRINGVALUE));
@@ -427,5 +475,504 @@ public class WomenCalendarDayActivity extends Activity {
     		mPeriodLength = c.getInt(c.getColumnIndex(Profile.PERIODLENGTH));
     	}
     	c.close();
+    }
+    
+    private Dialog createBmtAddDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
+        
+        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+        final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
+        
+        unit1.setText(R.string.celsius);
+        unit2.setText(R.string.fahrenheit);
+        
+        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				if(checkedId == unit1.getId()){
+					tv.setText(R.string.celsius_symbol);
+					//ev.setText(R.string.default_value_in_celsius);
+					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
+					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
+				}else if (checkedId == unit2.getId()){
+					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
+					tv.setText(R.string.fahrenheit_symbol);
+					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
+					//ev.setText(R.string.default_value_in_fahrenheit);
+				}
+			}
+        	
+        });
+        
+        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+        	scale.check(unit2.getId());
+        	tv.setText(R.string.fahrenheit_symbol);
+        	ev.setText(R.string.default_value_in_fahrenheit);
+        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+        	scale.check(unit1.getId());
+        	tv.setText(R.string.celsius_symbol);
+        	ev.setText(R.string.default_value_in_celsius);
+        }
+        
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.temperature)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+				String floatValue = ev.getText().toString();
+				ContentValues values = new ContentValues();
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
+				
+				if(!mLocalTemperatureScale.equals(mTemperatureScale)){
+					if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+						floatValue = Utils.fahrenheitToCelsius(floatValue);
+					}else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+						floatValue = Utils.celsiusToFahrenheit(floatValue);
+					}
+				}
+				values.put(Record.FLOATVALUE, floatValue);
+				mContentResolver.insert(Record.CONTENT_URI,values);
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.create();
+    }
+  
+    private Dialog createNoteAddDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_note_entry, null);
+        
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.note_value);
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.note)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+		        //EditText ev = (EditText)editEntryView.findViewById(R.id.note_value);
+				String stringValue = ev.getText().toString();
+				ContentValues values = new ContentValues();
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
+				values.put(Record.STRINGVALUE, stringValue);
+				mContentResolver.insert(Record.CONTENT_URI,values);
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.create();
+    }
+    
+    private Dialog createWeightAddDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
+        
+        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+        final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
+        
+        unit1.setText(R.string.kilogram);
+        unit2.setText(R.string.pound);
+        
+        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				if(checkedId == unit1.getId()){
+					tv.setText(R.string.kilogram_symbol);
+					ev.setText(Utils.poundToKg(ev.getText().toString()));
+					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
+				}else if (checkedId == unit2.getId()){
+					mLocalTemperatureScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
+					tv.setText(R.string.pound_symbol);
+					ev.setText(Utils.kgToPound(ev.getText().toString()));
+					//ev.setText(R.string.default_value_in_fahrenheit);
+				}
+			}
+        	
+        });
+        
+        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+        	scale.check(unit2.getId());
+        	tv.setText(R.string.kilogram_symbol);
+        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+        	scale.check(unit1.getId());
+        	tv.setText(R.string.pound_symbol);
+        }
+        
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.weight)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+				String floatValue = ev.getText().toString();
+				ContentValues values = new ContentValues();
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
+				
+				if(!mLocalWeightScale.equals(mWeightScale)){
+					if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+						floatValue = Utils.poundToKg(floatValue);
+					}else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+						floatValue = Utils.celsiusToFahrenheit(floatValue);
+					}
+				}
+				values.put(Record.FLOATVALUE, floatValue);
+				mContentResolver.insert(Record.CONTENT_URI,values);
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.create();
+    }
+    
+    private Dialog createWeightRemoveDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
+        
+        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+        final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
+    
+        unit1.setText(R.string.kilogram);
+        unit2.setText(R.string.pound);
+        
+        
+        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				if(checkedId == unit1.getId()){
+					tv.setText(R.string.kilogram_symbol);
+					ev.setText(Utils.poundToKg(ev.getText().toString()));
+					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
+				}else if (checkedId == unit2.getId()){
+					mLocalWeightScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
+					tv.setText(R.string.pound_symbol);
+					ev.setText(Utils.kgToPound(ev.getText().toString()));
+				}
+			}
+        	
+        });
+        
+        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+        	scale.check(unit2.getId());
+        	tv.setText(R.string.kilogram_symbol);
+        	
+        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+        	scale.check(unit1.getId());
+        	tv.setText(R.string.pound_symbol);
+        }
+        ev.setText(String.valueOf(getWeightValue()));
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.weight)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+				String floatValue = ev.getText().toString();
+				ContentValues values = new ContentValues();
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
+
+				
+				if(!mLocalWeightScale.equals(mWeightScale)){
+					if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+						//floatValue = Utils.celsiusToK(Utils.fahrenheitToCelsius(floatValue));
+						floatValue = Utils.fahrenheitToCelsius(floatValue);
+					}else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+						floatValue = Utils.celsiusToFahrenheit(floatValue);
+					}
+				}
+				values.put(Record.FLOATVALUE, floatValue);
+				mContentResolver.insert(Record.CONTENT_URI,values);
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.setNeutralButton(R.string.remove, new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
+						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_WEIGHT});
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.create();
+    }
+    
+    private Dialog createNoteRemoveDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_note_entry, null);
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.note_value);
+        
+        ev.setText(String.valueOf(getNoteValue()));
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.note)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				String floatValue = ev.getText().toString();
+				String where = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+				
+				ContentValues values = new ContentValues();
+				
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
+				values.put(Record.STRINGVALUE, floatValue);
+
+				mContentResolver.update(Record.CONTENT_URI,values,where, 
+										new String[]{Utils.RECORD_TYPE_NOTE,String.valueOf(mMillis/1000)});
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.setNeutralButton(R.string.remove, new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
+						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_NOTE});
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.create();
+    }    
+    
+    private Dialog createBmtRemoveDialog(){
+    	
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
+        
+        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+        final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+        final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
+        
+        unit1.setText(R.string.celsius);
+        unit2.setText(R.string.fahrenheit);
+        
+        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				if(checkedId == unit1.getId()){
+					tv.setText(R.string.celsius_symbol);
+					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
+					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
+				}else if (checkedId == unit2.getId()){
+					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
+					tv.setText(R.string.fahrenheit_symbol);
+					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
+				}
+			}
+        	
+        });
+        
+        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+        	scale.check(unit2.getId());
+        	tv.setText(R.string.fahrenheit_symbol);
+        	
+        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+        	scale.check(unit1.getId());
+        	tv.setText(R.string.celsius_symbol);
+        }
+        ev.setText(String.valueOf(getBmtValue()));
+        
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.temperature)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
+				String floatValue = ev.getText().toString();
+				ContentValues values = new ContentValues();
+				values.put(Record.PROFILEPK, mProfilePK);
+				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
+
+				
+				if(!mLocalTemperatureScale.equals(mTemperatureScale)){
+					if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+						//floatValue = Utils.celsiusToK(Utils.fahrenheitToCelsius(floatValue));
+						floatValue = Utils.fahrenheitToCelsius(floatValue);
+					}else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+						floatValue = Utils.celsiusToFahrenheit(floatValue);
+					}
+				}
+				values.put(Record.FLOATVALUE, floatValue);
+				mContentResolver.insert(Record.CONTENT_URI,values);
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+    		
+    	})
+    	.setNeutralButton(R.string.remove, new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
+						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_BMT});
+				//finish();
+				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+			}
+    		
+    	})
+    	.create();
+    }
+    
+    @Override
+    public Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_ADD_BMT:
+                return createBmtAddDialog();
+            case DIALOG_REMOVE_BMT:
+            	return createBmtRemoveDialog();
+            case DIALOG_ADD_WEIGHT:
+            	return createWeightAddDialog();
+            case DIALOG_REMOVE_WEIGHT:
+            	return createWeightRemoveDialog();
+            case DIALOG_ADD_NOTE:
+            	return createNoteAddDialog();
+            case DIALOG_REMOVE_NOTE:
+            	return createNoteRemoveDialog();            	
+        }
+        return super.onCreateDialog(id);
+    }
+    
+    private void getConfig(){
+    	Cursor cursor = mContentResolver.query(Config.CONTENT_URI,null,null,null,null);
+    	if( cursor != null){
+    		cursor.moveToFirst();
+    		if(cursor.getCount() != 0){
+	    		mTemperatureScale = cursor.getString(cursor.getColumnIndex(Config.TEMPERATURESCALE));
+	    		mLocalTemperatureScale = mTemperatureScale;
+	    		mWeightScale  = cursor.getString(cursor.getColumnIndex(Config.WEIGHTSCALE));
+	    		mLocalWeightScale = mWeightScale;
+	    		cursor.close();
+    		}else{
+    			mTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
+	    		mLocalTemperatureScale = mTemperatureScale;
+	    		mWeightScale  = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
+	    		mLocalWeightScale = mWeightScale;
+    		}
+    	}
     }
 }

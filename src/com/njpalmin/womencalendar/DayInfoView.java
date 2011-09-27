@@ -277,8 +277,9 @@ public class DayInfoView extends RelativeLayout {
     
     private float getWeightValue(){
     	float weightValue = 0.0f;
-    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_WEIGHT + " AND " + Record.FLOATVALUE + "=?";
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
+    									  new String[]{Utils.RECORD_TYPE_WEIGHT,String.valueOf(mMillis/1000)},null);
     	if(c != null){
     		c.moveToFirst();
     		weightValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
@@ -290,11 +291,13 @@ public class DayInfoView extends RelativeLayout {
  
     private float getBmtValue(){
     	float bmtValue = 0.0f;
-    	String selection = Record.TYPE + "=" + Utils.RECORD_TYPE_BMT + " AND " + Record.FLOATVALUE + "=?";
-    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{String.valueOf(mMillis)},null);
+    	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
+    	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,new String[]{Utils.RECORD_TYPE_BMT ,String.valueOf(mMillis/1000)},null);
     	if(c != null){
-    		c.moveToFirst();
-    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		if(c.getCount() != 0){
+	    		c.moveToFirst();
+	    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+    		}
     		c.close();
     	}
     	

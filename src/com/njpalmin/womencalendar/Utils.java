@@ -34,6 +34,11 @@ public class Utils {
     public final static String RECORD_TYPE_WEIGHT = "weight";
     public final static String RECORD_TYPE_NOTE = "note";
     
+    public final static String CONFIG_TEMPERATURE_FAHRENHEIT_SCALE= "FAHRENHEIT";
+    public final static String CONFIG_TEMPERATURE_CELSIUS_SCALE= "CELSIUS";
+    public final static String CONFIG_WEIGHT_KILOGRAM_SCALE= "KILOGRAM";
+    public final static String CONFIG_WEIGHT_POUND_SCALE= "POUND";
+    
 	public final static int DAY_TYPE_NORMAL = 1;
 	public final static int DAY_TYPE_START = 2;
 	public final static int DAY_TYPE_MIDDLE = 3;
@@ -158,4 +163,40 @@ public class Utils {
     			return 30;
     	}
     }
+    public static String celsiusToFahrenheit(String celsius){
+    	if(celsius.equals("")){
+    		return String.valueOf(0.0f);
+    	}
+    	return String.valueOf(32.00f+ 1.8f * Float.valueOf(celsius).floatValue());
+    }
+    
+    public static String fahrenheitToCelsius(String fahrenheit){
+    	if(fahrenheit.equals("")){
+    		return String.valueOf(0.0f);
+    	}
+    	
+    	return String.valueOf((Float.valueOf(fahrenheit).floatValue()-32.00f)/1.8f);
+    }
+
+    public static String celsiusToK(String celsius){
+    	if(celsius.equals("")){
+    		return String.valueOf(0.0f);
+    	}
+    	return String.valueOf(273.15f +  Float.valueOf(celsius).floatValue());
+    }
+    
+    public static String kToCelsius(String k){
+    	if(k.equals("")){
+    		return String.valueOf(0.0f);
+    	}
+    	return  String.valueOf( Float.valueOf(k).floatValue()- 273.15f);
+    }
+
+    public static String kgToPound(String kg){
+    	return  String.valueOf(Float.valueOf(kg).floatValue()/2.2046f);
+    }
+    
+    public static String poundToKg(String pound){
+    	return  String.valueOf(Float.valueOf(pound).floatValue() * 2.2046f);
+    }    
 }

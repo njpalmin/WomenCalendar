@@ -52,6 +52,7 @@ public class BMTChartActivity extends AbstractImplChart {
       public void onClick(View v) {
         Intent intent = new Intent(BMTChartActivity.this, WomenCalendarActivity.class);
         startActivity(intent);
+        finish();
       }
     });
 	
@@ -60,6 +61,7 @@ public class BMTChartActivity extends AbstractImplChart {
       public void onClick(View v) {
         Intent intent = new Intent(BMTChartActivity.this, WeightChartActivity.class);
         startActivity(intent);
+        finish();
       }
     });
   }
@@ -83,7 +85,7 @@ public class BMTChartActivity extends AbstractImplChart {
 	    renderer.setMarginsColor(Color.rgb(200, 174, 224));
 	    renderer.setPanLimits(new double[] { 0, Integer.MAX_VALUE, BMT_MIN_VALUE, BMT_MAX_VALUE});
 	    renderer.setBarSpacing(0.5);
-	    renderer.setYlabelSuffix("C");
+	    renderer.setYlabelSuffix("\u00b0");
 	    
 	    TimeSeries BMTSeries = new TimeSeries();
 	    XYSeriesRenderer BMTRenderer = new XYSeriesRenderer();
@@ -125,8 +127,9 @@ public class BMTChartActivity extends AbstractImplChart {
 	    	if (cursorOfBmt != null) countOfBmt = cursorOfBmt.getCount();
 	    	if (countOfBmt != 0) {
 	    		for (cursorOfBmt.moveToFirst(); !cursorOfBmt.isAfterLast(); cursorOfBmt.moveToNext()) {
-	    			BMTSeries.add(((long)cursor.getInt(cursor.getColumnIndex(Record.DATE))) * 1000,
-	    					cursor.getFloat(cursor.getColumnIndex(Record.FLOATVALUE)));
+	    			time.set(((long)cursorOfBmt.getInt(cursorOfBmt.getColumnIndex(Record.DATE))) * 1000);
+	    			BMTSeries.add(new Date(time.year - 1900, time.month, time.monthDay) ,
+	    					cursorOfBmt.getFloat(cursorOfBmt.getColumnIndex(Record.FLOATVALUE)));
 	    			
 	    			dataCountOfBmt++;
 	    		}
