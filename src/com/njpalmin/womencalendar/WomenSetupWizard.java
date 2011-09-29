@@ -30,8 +30,8 @@ public class WomenSetupWizard extends Activity {
 	}
 	
 	private void initDialog() {
-		welcomeDialog = new AlertDialog.Builder(this).setTitle("1/5").setMessage(R.string.setup_welcome)
-			.setPositiveButton(R.string.setup_btn_next, new DialogInterface.OnClickListener() {				
+		welcomeDialog = new AlertDialog.Builder(this).setTitle("1/5").setMessage(R.string.first_run_start_1)
+			.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -86,14 +86,14 @@ public class WomenSetupWizard extends Activity {
 		});
 		periodSetDialog = new AlertDialog.Builder(this).setTitle("2/5")
 			.setView(periodView)
-			.setPositiveButton(R.string.setup_btn_back, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					welcomeDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.setup_btn_next, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -123,14 +123,14 @@ public class WomenSetupWizard extends Activity {
 		daygroup.check(0);
 		daySetDialog = new AlertDialog.Builder(this).setTitle("3/5")
 			.setView(daySetView)
-			.setPositiveButton(R.string.setup_btn_back, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					periodSetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.setup_btn_next, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -161,14 +161,14 @@ public class WomenSetupWizard extends Activity {
 		langroup.check(0);
 		lanSetDialog = new AlertDialog.Builder(this).setTitle("4/5")
 			.setView(lanSetView)
-			.setPositiveButton(R.string.setup_btn_back, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					daySetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.setup_btn_next, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -187,15 +187,15 @@ public class WomenSetupWizard extends Activity {
 			}
 		});
 		
-		endDialog = new AlertDialog.Builder(this).setTitle("5/5").setMessage(R.string.setup_end)
-			.setPositiveButton(R.string.setup_btn_back, new DialogInterface.OnClickListener() {				
+		endDialog = new AlertDialog.Builder(this).setTitle("5/5").setMessage(R.string.first_run_finish_1)
+			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					lanSetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.setup_end_use, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.start_to_use_calendar, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();

@@ -366,14 +366,14 @@ public class WomenCalendarActivity extends Activity {
         menu.add(0, MENU_NOTIFICATIONS, 0, R.string.notifications)
         .setIcon(R.drawable.ic_menu_notifications);
 
-        menu.add(0, MENU_HELP_ABOUT, 0, R.string.help)
+        menu.add(0, MENU_HELP_ABOUT, 0, R.string.help_about_us)
         .setIcon(R.drawable.ic_menu_help);
 
-        menu.add(0, MENU_SELECT_LOCALE, 0, R.string.select_language);
+        menu.add(0, MENU_SELECT_LOCALE, 0, R.string.choose_language);
         //.setIcon(R.drawable.ic_menu_period_lenght)
         menu.add(0, MENU_TEMPERATURE_SCALE, 0, R.string.temperature);
         menu.add(0, MENU_WEEK_START, 0, R.string.week_starts_with);
-        menu.add(0, MENU_BACK_UP, 0, R.string.bakc_up);
+        menu.add(0, MENU_BACK_UP, 0, R.string.backup);
         menu.add(0, MENU_STATISTICS, 0, R.string.statistics);
         
         
@@ -442,8 +442,8 @@ public class WomenCalendarActivity extends Activity {
     
     private Dialog createRestrictionDialog(){
     	return new  AlertDialog.Builder(this)
-    	.setMessage(getString(R.string.restriction))
-    	.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener(){
+    	.setMessage(getString(R.string.pro_only_functionality))
+    	.setNeutralButton(R.string.send, new DialogInterface.OnClickListener(){
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// TODO Auto-generated method stub

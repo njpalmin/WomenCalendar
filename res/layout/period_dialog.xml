@@ -4,7 +4,7 @@
     	android:layout_width="wrap_content" android:orientation="vertical">
         <LinearLayout android:layout_height="match_parent" android:layout_width="wrap_content">
             <TextView android:layout_height="wrap_content"  android:layout_width="170dip" 
-            	android:text="@string/setup_period_length"
+            	android:text="@string/first_run_enter_cycle_length"
             	android:layout_gravity="center_vertical"/>
             <Button android:layout_height="wrap_content" android:layout_width="40dip" 
             	android:id="@+id/btn_cycle_plus" android:text="@string/setup_period_plus"
@@ -19,7 +19,7 @@
         </LinearLayout>
         <LinearLayout android:layout_height="match_parent" android:layout_width="wrap_content">
         	<TextView android:layout_height="wrap_content" android:layout_width="170dip"
-        		android:text="@string/setup_period_bmt_length" 
+        		android:text="@string/first_run_enter_period_length" 
         		android:layout_gravity="center_vertical"/>
             <Button android:layout_height="wrap_content"  android:layout_width="40dip"
             	android:id="@+id/btn_length_plus" android:text="@string/setup_period_plus"

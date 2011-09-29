@@ -390,7 +390,7 @@ public class WomenCalendarDayActivity extends Activity {
     			bmt.setText(String.valueOf(getBmtValue()));
     			dayInfoLayout.addView(bmt);
 	    		TextView bmtAdd = (TextView)findViewById(R.id.day_bmt_add);
-	    		bmtAdd.setText(getString(R.string.remove_edit));     			
+	    		bmtAdd.setText(getString(R.string.edit_remove));     			
     		}
     		
     		if((mNotification & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
@@ -398,12 +398,12 @@ public class WomenCalendarDayActivity extends Activity {
     			weight.setText(String.valueOf(getWeightValue()));
     			dayInfoLayout.addView(weight);
 	    		TextView weightAdd = (TextView)findViewById(R.id.day_weight_add);
-	    		weightAdd.setText(getString(R.string.remove_edit));     			
+	    		weightAdd.setText(getString(R.string.edit_remove));     			
     		}
     		
     		if((mNotification & Utils.NOTIFICATION_TYPE_NOTE) != 0){
 	    		TextView noteAdd = (TextView)findViewById(R.id.day_note_add);
-	    		noteAdd.setText(getString(R.string.remove_edit));
+	    		noteAdd.setText(getString(R.string.edit_remove));
 	    		
 
 	    		noParameter.setVisibility(View.GONE); 
@@ -623,12 +623,12 @@ public class WomenCalendarDayActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				// TODO Auto-generated method stub
 				if(checkedId == unit1.getId()){
-					tv.setText(R.string.kilogram_symbol);
+					tv.setText(R.string.kg);
 					ev.setText(Utils.poundToKg(ev.getText().toString()));
 					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
 				}else if (checkedId == unit2.getId()){
 					mLocalTemperatureScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
-					tv.setText(R.string.pound_symbol);
+					tv.setText(R.string.lb);
 					ev.setText(Utils.kgToPound(ev.getText().toString()));
 					//ev.setText(R.string.default_value_in_fahrenheit);
 				}
@@ -638,10 +638,10 @@ public class WomenCalendarDayActivity extends Activity {
         
         if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
         	scale.check(unit2.getId());
-        	tv.setText(R.string.kilogram_symbol);
+        	tv.setText(R.string.kg);
         }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
         	scale.check(unit1.getId());
-        	tv.setText(R.string.pound_symbol);
+        	tv.setText(R.string.lb);
         }
         
         
@@ -707,12 +707,12 @@ public class WomenCalendarDayActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				// TODO Auto-generated method stub
 				if(checkedId == unit1.getId()){
-					tv.setText(R.string.kilogram_symbol);
+					tv.setText(R.string.kg);
 					ev.setText(Utils.poundToKg(ev.getText().toString()));
 					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
 				}else if (checkedId == unit2.getId()){
 					mLocalWeightScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
-					tv.setText(R.string.pound_symbol);
+					tv.setText(R.string.lb);
 					ev.setText(Utils.kgToPound(ev.getText().toString()));
 				}
 			}
@@ -721,11 +721,11 @@ public class WomenCalendarDayActivity extends Activity {
         
         if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
         	scale.check(unit2.getId());
-        	tv.setText(R.string.kilogram_symbol);
+        	tv.setText(R.string.kg);
         	
         }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
         	scale.check(unit1.getId());
-        	tv.setText(R.string.pound_symbol);
+        	tv.setText(R.string.lb);
         }
         ev.setText(String.valueOf(getWeightValue()));
         
