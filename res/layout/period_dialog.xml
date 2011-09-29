@@ -1,0 +1,35 @@
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    	android:layout_height="wrap_content" android:id="@+id/linearLayout1" 
+    	android:layout_width="wrap_content" android:orientation="vertical">
+        <LinearLayout android:layout_height="match_parent" android:layout_width="wrap_content">
+            <TextView android:layout_height="wrap_content"  android:layout_width="170dip" 
+            	android:text="@string/setup_period_length"
+            	android:layout_gravity="center_vertical"/>
+            <Button android:layout_height="wrap_content" android:layout_width="40dip" 
+            	android:id="@+id/btn_cycle_plus" android:text="@string/setup_period_plus"
+            	android:layout_gravity="center_vertical"/>
+            <EditText android:layout_height="wrap_content" android:layout_width="60dip"  
+            	android:text="28" android:id="@+id/text_cycle" android:inputType="number"
+            	android:gravity="right"
+            	android:layout_gravity="center_vertical"/>
+            <Button android:layout_height="wrap_content" android:id="@+id/btn_cycle_minus" android:layout_width="40dip"
+            	android:text="@string/setup_period_minus"
+            	android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+        <LinearLayout android:layout_height="match_parent" android:layout_width="wrap_content">
+        	<TextView android:layout_height="wrap_content" android:layout_width="170dip"
+        		android:text="@string/setup_period_bmt_length" 
+        		android:layout_gravity="center_vertical"/>
+            <Button android:layout_height="wrap_content"  android:layout_width="40dip"
+            	android:id="@+id/btn_length_plus" android:text="@string/setup_period_plus"
+            	android:layout_gravity="center_vertical"/>
+            <EditText android:layout_height="wrap_content" android:layout_width="60dip"
+            	android:text="4" android:id="@+id/text_length" android:inputType="number"
+            	android:gravity="right"
+            	android:layout_gravity="center_vertical"/>
+            <Button android:layout_height="wrap_content" android:layout_width="40dip"
+            	android:id="@+id/btn_length_minus" android:text="@string/setup_period_minus"
+            	android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+    </LinearLayout>

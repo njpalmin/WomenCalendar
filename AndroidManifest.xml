@@ -32,6 +32,10 @@
 
             </intent-filter>
         </activity>
-       
-    </application>
+       <activity android:name=".WomenSetupWizard">
+		<intent-filter>
+		
+		</intent-filter>
+		</activity>
+	</application>
 </manifest>

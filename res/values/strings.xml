@@ -28,6 +28,7 @@
  	<string name="remove_edit">Remove/Edit</string>
  	<string name="save">Save</string>
  	<string name="cancel">Cancel</string>
+ 	<string name="ok">Ok</string>
 
  	<string name="celsius">Celsius</string>
  	<string name="fahrenheit">Fahrenheit</string>
@@ -52,4 +53,18 @@
 	<string name="period_length">Period Length</string>
 	<string name="auto_forecast">Automatic Forecast</string>
 	
+	<string name="setup_welcome">Welcome to WomanCalendar calendar!\nPlease perform initial setup.\nYou can edit these and other settings later via the Settings menu.</string>
+	<string name="setup_end">You can edit these and other settings later via the Settings menu.\nThank you for choosing WomanCalendar!</string>
+	<string name="setup_period_length">Enter your average cycle length:</string>
+	<string name="setup_period_bmt_length">Enter your average length of menstrual period:</string>
+	<string name="setup_period_plus">+</string>
+	<string name="setup_period_minus">-</string>
+	<string name="setup_btn_back">Back</string>
+	<string name="setup_btn_next">Next</string>
+	<string name="setup_end_use">Start using your calendar</string>
+	<string name="setup_firstday_week">Please select the first day of the week:</string>
+	<string name="setup_language">Please select language:</string>
+
+	<string name="restriction">This Feature is not available in the free version.</string>
+
 </resources>

@@ -54,12 +54,14 @@ public class WomenCalendarActivity extends Activity {
     private static final int DIALOG_WEEK_START = 5;
     private static final int DIALOG_BACK_UP = 6;
     private static final int DIALOG_STATISTICS = 7;
-    
+    private static final int DIALOG_SKINS = 8;
     
 	private WomenCalendarView mView;
     private int mStartDay;
     private ContentResolver mContentResolver;
     private RecordObserver mRecordObserver = null;
+    private ProfileObserver mProfileObserver = null;
+    private ConfigObserver mConfigObserver = null;
 	//private CallLogObserver mCallLogObserver = null;
 	private Handler mHandler = new Handler();
     private Time mTime;
@@ -69,7 +71,6 @@ public class WomenCalendarActivity extends Activity {
     private ImageView mNextMonthIV;
     private LinearLayout mCalendarLayout;
     private Cursor mCursor;
-
     private QueryHandler mQueryHandler;
 
     private static final int DAY_OF_WEEK_LABEL_IDS[] = {
@@ -137,6 +138,11 @@ public class WomenCalendarActivity extends Activity {
         StringBuffer date = new StringBuffer(Utils.formatMonthYear(this, mTime));
         title.setText(date.toString());
         
+        if (getApplicationContext().getSharedPreferences(null, MODE_PRIVATE)
+        		.getBoolean("first_start", true)) {
+        		startActivity(new Intent(this, WomenSetupWizard.class));
+        }
+
         mContentResolver = getContentResolver();
         
         mCursor = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
@@ -158,10 +164,12 @@ public class WomenCalendarActivity extends Activity {
             values.put(Profile.OVULATIONNOTIFICATION, 0);
             mContentResolver.insert(Profile.CONTENT_URI,values);
         }
-        
+
         mRecordObserver = new RecordObserver(mHandler);
+        mProfileObserver = new ProfileObserver(mHandler);
+        mConfigObserver = new ConfigObserver(mHandler);
         mQueryHandler = new QueryHandler(this);
-        registerRecordObserver();
+        registerObserver();
         initView();
     }
     
@@ -169,7 +177,7 @@ public class WomenCalendarActivity extends Activity {
 	public void onDestroy(){
 		Log.d(TAG,"onDestroy");
 		super.onDestroy();
-		unregisterRecordObserver();
+		unregisterObserver();
 	}
     
     
@@ -238,17 +246,48 @@ public class WomenCalendarActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
     	if(requestCode == DAY_ACTIVITY_DETAILS && resultCode ==RESULT_OK){
     		long millis = intent.getLongExtra(Utils.EVENT_BEGIN_TIME, 0);
-    		/*
-    		String operate = intent.getStringExtra(Utils.DAY_TYPE);
-    		
-    		Time setTime = new Time();
-    		setTime.set(millis);
-    		
-    		if(mWomenCalendarView != null){
-    			mWomenCalendarView.invalidate();//InitView(this,mTime,setTime);
-    		}*/
     	}
     }    
+    
+    private class ConfigObserver extends ContentObserver{
+
+		public ConfigObserver(Handler handler) {
+			super(handler);
+			// TODO Auto-generated constructor stub
+		}
+    	
+	    public void onChange(boolean selfChange){
+	        try{
+	            //Log.d(LOG_TAG, "Call log changed");
+	            super.onChange(selfChange);
+	            //mCallLog.setStatusToChanged();
+	            //startQuery();
+	            mView.reDrawView(mTime);
+	        }catch (Exception e){
+	            Log.e(TAG, e.toString());
+	        }
+	    }
+    }
+    
+    private class ProfileObserver extends ContentObserver{
+
+		public ProfileObserver(Handler handler) {
+			super(handler);
+			// TODO Auto-generated constructor stub
+		}
+    	
+	    public void onChange(boolean selfChange){
+	        try{
+	            //Log.d(LOG_TAG, "Call log changed");
+	            super.onChange(selfChange);
+	            //mCallLog.setStatusToChanged();
+	            //startQuery();
+	            mView.reDrawView(mTime);
+	        }catch (Exception e){
+	            Log.e(TAG, e.toString());
+	        }
+	    }
+    }
     
     private class RecordObserver extends ContentObserver{
 
@@ -291,25 +330,27 @@ public class WomenCalendarActivity extends Activity {
 		
 	}
 	
-	private void registerRecordObserver(){
+	private void registerObserver(){
 		mContentResolver.registerContentObserver(Record.CONTENT_URI,true, mRecordObserver);
+		mContentResolver.registerContentObserver(Record.CONTENT_URI,true, mProfileObserver);
+		mContentResolver.registerContentObserver(Record.CONTENT_URI,true, mConfigObserver);
 	}
 	
-	private void unregisterRecordObserver(){
+	private void unregisterObserver(){
 		if(mRecordObserver != null){
 			mContentResolver.unregisterContentObserver(mRecordObserver);
 			mRecordObserver = null;
 		}
+		if(mProfileObserver != null){
+			mContentResolver.unregisterContentObserver(mProfileObserver);
+			mProfileObserver = null;
+		}
+		if(mConfigObserver != null){
+			mContentResolver.unregisterContentObserver(mConfigObserver);
+			mConfigObserver = null;
+		}		
 	}
-	/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.womancalendar_menu, menu);
 
-        return true;//super.onCreateOptionsMenu(menu);
-    }*/
-	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -345,22 +386,31 @@ public class WomenCalendarActivity extends Activity {
     		showDialog(DIALOG_CYCLE_PERIOD_LENGTH);
     		return true;
     	case MENU_SKINS:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_SET_PASSWORD:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_NOTIFICATIONS:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_HELP_ABOUT:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_SELECT_LOCALE:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_TEMPERATURE_SCALE:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_WEEK_START:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_BACK_UP:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_STATISTICS:
+    		showDialog(DIALOG_SKINS);
     		return true;
     	default:
     		return super.onOptionsItemSelected(item);
@@ -372,21 +422,34 @@ public class WomenCalendarActivity extends Activity {
         switch (id) {
             case DIALOG_CYCLE_PERIOD_LENGTH:
                 return createCyclePeriodLengthDialog();
-                /*
             case DIALOG_SET_PASSWORD:
-            	return createBmtRemoveDialog();
+            	return createRestrictionDialog();
             case DIALOG_SELECT_SCALE:
-            	return createWeightAddDialog();
+            	return createRestrictionDialog();
             case DIALOG_TEMPERATURE_SCALE:
-            	return createWeightRemoveDialog();
+            	return createRestrictionDialog();
             case DIALOG_WEEK_START:
-            	return createNoteAddDialog();
+            	return createRestrictionDialog();
             case DIALOG_BACK_UP:
-            	return createNoteRemoveDialog();  
+            	return createRestrictionDialog();  
             case DIALOG_STATISTICS:
-            */
+            	return createRestrictionDialog();
+            case DIALOG_SKINS:
+            	return createRestrictionDialog();
         }
         return super.onCreateDialog(id);
+    }
+    
+    private Dialog createRestrictionDialog(){
+    	return new  AlertDialog.Builder(this)
+    	.setMessage(getString(R.string.restriction))
+    	.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+			}
+    	})
+    	.create();
     }
     
     private Dialog createCyclePeriodLengthDialog(){
