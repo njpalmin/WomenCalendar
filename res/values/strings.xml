@@ -36,4 +36,20 @@
  	<string name="kilogram_symbol">kg</string>
     <string name="pound_symbol">lb</string>
 
+	<string name="cycle_period_length">Cycle &amp; Period Length</string>
+	<string name="skins">Skins</string>
+	<string name="set_password">Set Password</string>
+	<string name="notifications">Notifications</string>
+	<string name="help">Help/About us</string>
+	<string name="more">More</string>
+	<string name="select_language">Select Language</string>
+	<string name="week_starts_with">Week Starts With</string>
+	<string name="bakc_up">Back Up</string>
+	<string name="statistics">Statistics</string>
+	
+	
+	<string name="cycle_length">Cycle Length</string>
+	<string name="period_length">Period Length</string>
+	<string name="auto_forecast">Automatic Forecast</string>
+	
 </resources>

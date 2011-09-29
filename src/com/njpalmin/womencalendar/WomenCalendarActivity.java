@@ -1,13 +1,15 @@
 package com.njpalmin.womencalendar;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -16,7 +18,12 @@ import android.os.Handler;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,7 +35,27 @@ public class WomenCalendarActivity extends Activity {
 	private static final String TAG = "WomenCalendarActivity";
 	public static final int DAY_ACTIVITY_DETAILS = 1;
 	private static final int QUERY_TOKEN = 53;
-
+	
+	private static final int MENU_CYCLE_PERIOD_LENGTH = Menu.FIRST + 1;
+    private static final int MENU_SKINS = MENU_CYCLE_PERIOD_LENGTH + 1;
+    private static final int MENU_SET_PASSWORD = MENU_SKINS + 1;
+    private static final int MENU_NOTIFICATIONS = MENU_SET_PASSWORD + 1;
+    private static final int MENU_HELP_ABOUT = MENU_NOTIFICATIONS + 1;
+    private static final int MENU_SELECT_LOCALE = MENU_HELP_ABOUT+ 1;
+    private static final int MENU_TEMPERATURE_SCALE = MENU_SELECT_LOCALE + 1;
+    private static final int MENU_WEEK_START = MENU_TEMPERATURE_SCALE + 1;
+    private static final int MENU_BACK_UP = MENU_WEEK_START + 1;
+    private static final int MENU_STATISTICS = MENU_BACK_UP + 1;
+	
+    private static final int DIALOG_CYCLE_PERIOD_LENGTH= 1;
+    private static final int DIALOG_SET_PASSWORD = 2;
+    private static final int DIALOG_SELECT_SCALE = 3;
+    private static final int DIALOG_TEMPERATURE_SCALE = 4;
+    private static final int DIALOG_WEEK_START = 5;
+    private static final int DIALOG_BACK_UP = 6;
+    private static final int DIALOG_STATISTICS = 7;
+    
+    
 	private WomenCalendarView mView;
     private int mStartDay;
     private ContentResolver mContentResolver;
@@ -274,5 +301,139 @@ public class WomenCalendarActivity extends Activity {
 			mRecordObserver = null;
 		}
 	}
+	/*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.womancalendar_menu, menu);
 
+        return true;//super.onCreateOptionsMenu(menu);
+    }*/
+	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, MENU_CYCLE_PERIOD_LENGTH, 0, R.string.cycle_period_length)
+        .setIcon(R.drawable.ic_menu_period_lenght);
+
+        menu.add(0, MENU_SKINS, 0, R.string.skins)
+        .setIcon(R.drawable.ic_menu_skins);
+
+        menu.add(0, MENU_SET_PASSWORD, 0, R.string.set_password)
+        .setIcon(R.drawable.ic_menu_password);
+
+        menu.add(0, MENU_NOTIFICATIONS, 0, R.string.notifications)
+        .setIcon(R.drawable.ic_menu_notifications);
+
+        menu.add(0, MENU_HELP_ABOUT, 0, R.string.help)
+        .setIcon(R.drawable.ic_menu_help);
+
+        menu.add(0, MENU_SELECT_LOCALE, 0, R.string.select_language);
+        //.setIcon(R.drawable.ic_menu_period_lenght)
+        menu.add(0, MENU_TEMPERATURE_SCALE, 0, R.string.temperature);
+        menu.add(0, MENU_WEEK_START, 0, R.string.week_starts_with);
+        menu.add(0, MENU_BACK_UP, 0, R.string.bakc_up);
+        menu.add(0, MENU_STATISTICS, 0, R.string.statistics);
+        
+        
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case MENU_CYCLE_PERIOD_LENGTH:
+    		showDialog(DIALOG_CYCLE_PERIOD_LENGTH);
+    		return true;
+    	case MENU_SKINS:
+    		return true;
+    	case MENU_SET_PASSWORD:
+    		return true;
+    	case MENU_NOTIFICATIONS:
+    		return true;
+    	case MENU_HELP_ABOUT:
+    		return true;
+    	case MENU_SELECT_LOCALE:
+    		return true;
+    	case MENU_TEMPERATURE_SCALE:
+    		return true;
+    	case MENU_WEEK_START:
+    		return true;
+    	case MENU_BACK_UP:
+    		return true;
+    	case MENU_STATISTICS:
+    		return true;
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    }
+
+    @Override
+    public Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_CYCLE_PERIOD_LENGTH:
+                return createCyclePeriodLengthDialog();
+                /*
+            case DIALOG_SET_PASSWORD:
+            	return createBmtRemoveDialog();
+            case DIALOG_SELECT_SCALE:
+            	return createWeightAddDialog();
+            case DIALOG_TEMPERATURE_SCALE:
+            	return createWeightRemoveDialog();
+            case DIALOG_WEEK_START:
+            	return createNoteAddDialog();
+            case DIALOG_BACK_UP:
+            	return createNoteRemoveDialog();  
+            case DIALOG_STATISTICS:
+            */
+        }
+        return super.onCreateDialog(id);
+    }
+    
+    private Dialog createCyclePeriodLengthDialog(){
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View editEntryView = factory.inflate(R.layout.alert_dialog_cycle_period_entry, null);
+        final Cursor c = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
+
+    	return new  AlertDialog.Builder(this)
+    	.setTitle(R.string.cycle_period_length)
+    	.setView(editEntryView)
+    	.setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				EditText cycleLength = (EditText)editEntryView.findViewById(R.id.cycle_length_lalue);
+				EditText periodLength = (EditText)editEntryView.findViewById(R.id.period_length_lalue);
+				CheckBox autoForecastCB = (CheckBox)editEntryView.findViewById(R.id.auto_forecast);
+				int autoForecast =  autoForecastCB.isChecked()? 1:0;
+				
+				int rowId = 0;
+				if(c != null && c.getCount() != 0){
+					c.moveToFirst();
+					rowId = c.getInt(c.getColumnIndex(Profile._ID));
+					c.close();
+				}
+				
+				if(rowId > 0){
+					ContentValues values = new ContentValues();
+					values.put(Profile.CYCLELENGTH, cycleLength.getText().toString());
+					values.put(Profile.PERIODLENGTH, periodLength.getText().toString());
+					values.put(Profile.AUTOMATICFORECAST,autoForecast);
+					mContentResolver.update(Profile.CONTENT_URI,values,"Profile._ID=?",new String[]{String.valueOf(rowId)});
+				}
+				
+				//finish();
+			}
+    		
+    	})
+    	.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// TODO Auto-generated method stub
+				//finish();
+			}
+    		
+    	})
+    	.create();
+    }
 }
