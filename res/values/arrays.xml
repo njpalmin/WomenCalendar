@@ -1,12 +1,12 @@
 <resources>
     <string-array name="dayset_values">
-        <item>Set by phone</item>
+        <item>Default</item>
         <item>Sunday</item>
         <item>Monday</item>
     </string-array>
     
     <string-array name="lanset_values">
-        <item>Set by phone</item>
+        <item>Default</item>
         <item>English</item>
         <item>Chinese Simple</item>
     </string-array>

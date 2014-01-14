@@ -1,31 +1,38 @@
 package com.njpalmin.womencalendar;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class WomenSetupWizard extends Activity {
-	private AlertDialog welcomeDialog;
+	private final static String TAG = "WomenSetupWizard";
+    private AlertDialog welcomeDialog;
 	private AlertDialog periodSetDialog;
 	private AlertDialog daySetDialog;
-	private AlertDialog lanSetDialog;
+	private AlertDialog localeSetDialog;
 	private AlertDialog endDialog;
 	private View periodView;
-	
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		
+		setRequestedOrientation(LinearLayout.VERTICAL);
 		initDialog();	
 	}
 	
@@ -52,11 +59,11 @@ public class WomenSetupWizard extends Activity {
 		
 		LayoutInflater factory = LayoutInflater.from(this);
 		periodView = factory.inflate(R.layout.period_dialog, null);
-		((Button)periodView.findViewById(R.id.btn_cycle_plus))
+        ((Button)periodView.findViewById(R.id.btn_cycle_plus))
 			.setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					EditText editText = (EditText)periodView.findViewById(R.id.text_cycle);
+					EditText editText = (EditText)periodView.findViewById(R.id.cycle_length);
 					editText.setText(String.valueOf(Integer.valueOf(editText.getText().toString()) + 1));
 				}
 			});
@@ -64,7 +71,7 @@ public class WomenSetupWizard extends Activity {
 			.setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					EditText editText = (EditText)periodView.findViewById(R.id.text_cycle);
+					EditText editText = (EditText)periodView.findViewById(R.id.cycle_length);
 					editText.setText(String.valueOf(Integer.valueOf(editText.getText().toString()) - 1));
 				}
 			});
@@ -72,7 +79,7 @@ public class WomenSetupWizard extends Activity {
 			.setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					EditText editText = (EditText)periodView.findViewById(R.id.text_length);
+					EditText editText = (EditText)periodView.findViewById(R.id.period_length);
 					editText.setText(String.valueOf(Integer.valueOf(editText.getText().toString()) + 1));
 				}
 			});
@@ -80,7 +87,7 @@ public class WomenSetupWizard extends Activity {
 		.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View v) {
-				EditText editText = (EditText)periodView.findViewById(R.id.text_length);
+				EditText editText = (EditText)periodView.findViewById(R.id.period_length);
 				editText.setText(String.valueOf(Integer.valueOf(editText.getText().toString()) - 1));
 			}
 		});
@@ -97,6 +104,14 @@ public class WomenSetupWizard extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
+					SharedPreferences appShared = 
+	                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+					Editor editor = appShared.edit();
+					EditText cycleLength = (EditText)periodView.findViewById(R.id.cycle_length);
+					EditText periodLength = (EditText)periodView.findViewById(R.id.period_length);
+					editor.putInt(Utils.SHARED_PREF_CYCLE_LENGTH,Integer.valueOf(cycleLength.getText().toString()));
+					editor.putInt(Utils.SHARED_PREF_PERIOD_LENGTH,Integer.valueOf(periodLength.getText().toString()));
+					editor.commit();
 					daySetDialog.show();
 				}
 			}).create();
@@ -112,7 +127,8 @@ public class WomenSetupWizard extends Activity {
 		});
 		
 		View daySetView = factory.inflate(R.layout.dayset_dialog, null);
-		RadioGroup daygroup = (RadioGroup)daySetView.findViewById(R.id.day_group);
+		final RadioGroup daygroup = (RadioGroup)daySetView.findViewById(R.id.day_group);
+		
 		String[] dayStrings = getResources().getStringArray(R.array.dayset_values);
 		for (int i = 0; i < dayStrings.length; i++) {
 			RadioButton radioBtn = new RadioButton(this);
@@ -121,6 +137,17 @@ public class WomenSetupWizard extends Activity {
 			daygroup.addView(radioBtn);
 		}
 		daygroup.check(0);
+		daygroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // TODO Auto-generated method stub
+                SharedPreferences appShared = 
+                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+                Editor editor = appShared.edit();
+                editor.putInt(Utils.SHARED_PREF_START_DAY,checkedId);
+                editor.commit();                
+                
+            }});
 		daySetDialog = new AlertDialog.Builder(this).setTitle("3/5")
 			.setView(daySetView)
 			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
@@ -134,7 +161,14 @@ public class WomenSetupWizard extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
-					lanSetDialog.show();
+	                SharedPreferences appShared = 
+	                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+	                if(appShared.getString(Utils.SHARED_PREF_START_DAY, null) == null) {
+	                    Editor editor = appShared.edit();
+	                    editor.putInt(Utils.SHARED_PREF_START_DAY,Calendar.getInstance().getFirstDayOfWeek());
+	                    editor.commit(); 
+	                }
+	                localeSetDialog.show();
 				}
 			})
 			.create();
@@ -150,16 +184,27 @@ public class WomenSetupWizard extends Activity {
 		});
 		
 		View lanSetView = factory.inflate(R.layout.lanset_dialog, null);
-		RadioGroup langroup = (RadioGroup)lanSetView.findViewById(R.id.lan_group);
-		String[] lanStrings = getResources().getStringArray(R.array.lanset_values);
-		for (int i = 0; i < lanStrings.length; i++) {
+		final RadioGroup localeGroup = (RadioGroup)lanSetView.findViewById(R.id.lan_group);
+		final String[] locales = getAssets().getLocales();
+		for (int i = 1; i < locales.length; i++) {
 			RadioButton radioBtn = new RadioButton(this);
-			radioBtn.setText(lanStrings[i]);
+			Locale locale = new Locale(locales[i]);
+			radioBtn.setText(locale.getDisplayName());
 			radioBtn.setId(i);
-			langroup.addView(radioBtn);
+			localeGroup.addView(radioBtn);
 		}
-		langroup.check(0);
-		lanSetDialog = new AlertDialog.Builder(this).setTitle("4/5")
+		localeGroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // TODO Auto-generated method stub
+                SharedPreferences appShared = 
+                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+                Editor editor = appShared.edit();
+                editor.putString(Utils.SHARED_PREF_LOCALE,locales[checkedId]);
+                editor.commit();                   
+            }
+		});
+		localeSetDialog = new AlertDialog.Builder(this).setTitle("4/5")
 			.setView(lanSetView)
 			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
@@ -176,7 +221,7 @@ public class WomenSetupWizard extends Activity {
 				}
 			})
 			.create();
-		lanSetDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {	
+		localeSetDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {	
 			@Override
 			public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -192,7 +237,7 @@ public class WomenSetupWizard extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
-					lanSetDialog.show();
+					localeSetDialog.show();
 				}
 			})
 			.setNegativeButton(R.string.start_to_use_calendar, new DialogInterface.OnClickListener() {				

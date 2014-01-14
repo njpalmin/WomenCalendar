@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/day"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content"
+    android:background="@drawable/calendar_day_standard">
+    
+    <TextView android:id="@+id/date"
+        style="@style/WideWidgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginTop="3dip"
+    	android:text="13">     
+    </TextView>
+    
+    <TextView android:id="@+id/period_day"
+        style="@style/SmallWidgetText"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
+        android:layout_toRightOf="@+id/date"
+        android:layout_marginLeft="2dip"
+        android:text="(1)"
+        android:visibility="invisible">
+	</TextView>
+
+    <ImageView
+        android:id="@+id/sex_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/period_day"
+        android:layout_marginTop="5dip"
+        android:layout_marginLeft="2dip"
+        android:src="@drawable/calendar_sex" 
+        android:visibility="invisible"/>
+    
+    <ImageView
+        android:id="@+id/mood_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/date"
+        android:layout_marginTop="2dip"
+        android:layout_marginLeft="1dip"
+        android:src="@drawable/calendar_mood_angry" 
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/note_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mood_notification"
+        android:layout_toRightOf="@+id/mood_notification"
+        android:layout_marginLeft="2dip"
+        android:src="@drawable/calendar_note" 
+        android:visibility="invisible"/>
+    
+    <ImageView
+        android:id="@+id/pill_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/note_notification"
+        android:layout_toRightOf="@+id/note_notification"
+        android:layout_marginLeft="3dip"
+        android:src="@drawable/calendar_pill" 
+        android:visibility="invisible"/>    
+    
+	<TextView android:id="@+id/temperature"
+        style="@style/SmallWidgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mood_notification"
+        android:layout_marginLeft="2dip"
+        android:layout_marginTop="3dip"
+    	android:text="13"
+    	android:visibility="invisible">   
+    </TextView>
+
+	<TextView android:id="@+id/weight"
+        style="@style/SmallWidgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/temperature"
+        android:layout_marginLeft="2dip"
+    	android:text="13"
+    	android:visibility="invisible">
+    </TextView>
+
+	<ImageView
+	    android:id="@+id/others_notification"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignRight="@+id/pill_notification"
+	    android:layout_alignTop="@+id/temperature"
+	    android:src="@drawable/calendar_symptoms" 
+	    android:visibility="invisible"/>
+	
+</RelativeLayout>

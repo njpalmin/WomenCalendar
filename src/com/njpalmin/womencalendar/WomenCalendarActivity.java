@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -101,9 +102,10 @@ public class WomenCalendarActivity extends Activity {
         mContentResolver = getContentResolver();
 
         setRequestedOrientation(LinearLayout.VERTICAL);
-        mStartDay = Calendar.getInstance().getFirstDayOfWeek();
+        SharedPreferences appShared = 
+                getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+        mStartDay = appShared.getInt(Utils.SHARED_PREF_START_DAY, Calendar.getInstance().getFirstDayOfWeek());
         
-       
         long now = System.currentTimeMillis();
 
         mTime = new Time();
@@ -464,8 +466,8 @@ public class WomenCalendarActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// TODO Auto-generated method stub
-				EditText cycleLength = (EditText)editEntryView.findViewById(R.id.cycle_length_lalue);
-				EditText periodLength = (EditText)editEntryView.findViewById(R.id.period_length_lalue);
+				EditText cycleLength = (EditText)editEntryView.findViewById(R.id.cycle_length_value);
+				EditText periodLength = (EditText)editEntryView.findViewById(R.id.period_length_value);
 				CheckBox autoForecastCB = (CheckBox)editEntryView.findViewById(R.id.auto_forecast);
 				int autoForecast =  autoForecastCB.isChecked()? 1:0;
 				

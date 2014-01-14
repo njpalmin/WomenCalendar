@@ -20,7 +20,7 @@
 	  <EditText android:maxLength="2" 
 	  		android:inputType="number" 
 	  		android:layout_width="wrap_content" 
-	  		android:id="@+id/cycle_length_lalue" 
+	  		android:id="@+id/cycle_length_value" 
 	  		android:text="28" 
 	  		android:layout_height="wrap_content" 
 	  		android:layout_alignParentRight="true">
@@ -41,7 +41,7 @@
 			android:layout_gravity="center_vertical"
 			android:layout_alignParentLeft="true"/>
 		<EditText
-		    android:id="@+id/period_length_lalue"
+		    android:id="@+id/period_length_value"
 		    android:layout_height="wrap_content"
 		    android:layout_width="wrap_content" 
 		    android:inputType="number"

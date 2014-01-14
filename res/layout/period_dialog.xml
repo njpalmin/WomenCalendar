@@ -10,7 +10,7 @@
             	android:id="@+id/btn_cycle_plus" android:text="@string/setup_period_plus"
             	android:layout_gravity="center_vertical"/>
             <EditText android:layout_height="wrap_content" android:layout_width="60dip"  
-            	android:text="28" android:id="@+id/text_cycle" android:inputType="number"
+            	android:text="28" android:id="@+id/cycle_length" android:inputType="number"
             	android:gravity="right"
             	android:layout_gravity="center_vertical"/>
             <Button android:layout_height="wrap_content" android:id="@+id/btn_cycle_minus" android:layout_width="40dip"
@@ -25,7 +25,7 @@
             	android:id="@+id/btn_length_plus" android:text="@string/setup_period_plus"
             	android:layout_gravity="center_vertical"/>
             <EditText android:layout_height="wrap_content" android:layout_width="60dip"
-            	android:text="4" android:id="@+id/text_length" android:inputType="number"
+            	android:text="4" android:id="@+id/period_length" android:inputType="number"
             	android:gravity="right"
             	android:layout_gravity="center_vertical"/>
             <Button android:layout_height="wrap_content" android:layout_width="40dip"

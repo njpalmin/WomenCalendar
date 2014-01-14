@@ -1,8 +1,6 @@
 package com.njpalmin.womencalendar;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +9,12 @@ import android.text.format.Time;
 public class Utils {
     private static final boolean DEBUG = true;
     private static final String TAG = "CalUtils";
+    
+    
+    public static final String SHARED_PREF_CYCLE_LENGTH = "cycle_legnth";
+    public static final String SHARED_PREF_PERIOD_LENGTH = "period_legnth";
+    public static final String SHARED_PREF_START_DAY = "start_day";
+    public static final String SHARED_PREF_LOCALE = "locale";
     
     public static final String EVENT_BEGIN_TIME = "beginTime";
     public static final String EVENT_DAY_TYPE = "dayType";

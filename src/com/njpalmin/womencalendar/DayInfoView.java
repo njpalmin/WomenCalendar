@@ -78,8 +78,6 @@ public class DayInfoView extends RelativeLayout {
 			mCursor = cursor;
 		}
 		
-		
-		
 		mDay = mCursor.getDayAt(row,column);
 		
 		mTime = new Time();
@@ -214,8 +212,9 @@ public class DayInfoView extends RelativeLayout {
 		        								RelativeLayout.LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 		params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+		params.setMargins(5, 3, 0, 0);
 		mDateTV.setLayoutParams(params);
-		mDateTV.setTextSize(14);
+		mDateTV.setTextSize(15);
 		if(mWithinCurrentMonth){
 			mDateTV.setTextColor(Color.BLACK);
 		}else{

@@ -6,17 +6,15 @@ import java.util.Calendar;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 
-import com.njpalmin.womencalendar.WomenCalendar.Profile;
 import com.njpalmin.womencalendar.WomenCalendar.Record;
 
 public class WomenCalendarView extends View {
@@ -78,13 +76,11 @@ public class WomenCalendarView extends View {
 		for(int i=0;i<WEEKS;i++){
 			for(int j=0;j<WEEKDAYS;j++){
 				DayInfoView[] weekDays = new DayInfoView[WEEKDAYS];
-				//int monthDay = mCursor.getDayAt(i,j);
-				//boolean withinCurrentMonth = mCursor.isWithinCurrentMonth(i, j);
 				int dayType = getDayType(i,j);
 				int notification = getNotification(i,j);
 				weekDays[j] = new DayInfoView(mContext,i,j,mCursor,dayType,notification);
 				LinearLayout.LayoutParams llp  = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.MATCH_PARENT,1);
-				llp.setMargins(2,2,2,2);
+				llp.setMargins(2,2,0,0);
 				weekDays[j].setLayoutParams(llp);
 				weekDays[j].setOnClickListener(new View.OnClickListener() {
 		            public void onClick(View v) {
@@ -93,13 +89,11 @@ public class WomenCalendarView extends View {
 		            	intent.putExtra(Utils.EVENT_DAY_TYPE, ((DayInfoView)v).getDayType());
 		            	intent.putExtra(Utils.EVENT_NOTIFICATION, ((DayInfoView)v).getNotification());
 		            	mParentActivity.startActivityForResult(intent,WomenCalendarActivity.DAY_ACTIVITY_DETAILS);
-		                //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
 		            }
 		        });
 				mWeekLayout[i].addView(weekDays[j]);
 			}
 			mParentLayout.addView(mWeekLayout[i]);
-			//addView(mWeekLayout[i]);
 		}
 	}
 	
@@ -156,7 +150,6 @@ public class WomenCalendarView extends View {
 	}
 	
 	private int getDayType(int row, int column){
-
 		int day = mCursor.getDayAt(row,column);
 		Time time = new Time();
 		time.set(day,mCursor.getMonth(),mCursor.getYear());
@@ -190,13 +183,16 @@ public class WomenCalendarView extends View {
 	}
 	
     private void getCycleAndPeriodLength(){
-    	Cursor c = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
-    	if(c != null){
-    		c.moveToFirst();
-    		mCycleLength = c.getInt(c.getColumnIndex(Profile.CYCLELENGTH));
-    		mPeriodLength = c.getInt(c.getColumnIndex(Profile.PERIODLENGTH));
-    	}
-    	c.close();
+//    	Cursor c = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
+//    	if(c != null){
+//    		c.moveToFirst();
+//    		mCycleLength = c.getInt(c.getColumnIndex(Profile.CYCLELENGTH));
+//    		mPeriodLength = c.getInt(c.getColumnIndex(Profile.PERIODLENGTH));
+//    	}
+//    	c.close();
+        SharedPreferences prefs = mContext.getSharedPreferences(null, Context.MODE_PRIVATE);
+        mCycleLength = prefs.getInt(Utils.SHARED_PREF_CYCLE_LENGTH, 28);
+        mPeriodLength = prefs.getInt(Utils.SHARED_PREF_PERIOD_LENGTH, 4);
     }
     
     private int getNotification(int row, int column){
