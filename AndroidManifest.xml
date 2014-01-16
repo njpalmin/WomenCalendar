@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.njpalmin.womencalendar"
+      package="com.womencalendar"
       android:versionCode="1"
       android:versionName="1.0">
 
-	<uses-sdk android:minSdkVersion="11"
-        	  android:targetSdkVersion="18" />
+	<uses-sdk android:minSdkVersion="11"/>
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".WomenCalendarActivity"
@@ -15,11 +14,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <provider android:name="WomenCalendarProvider"
-     		android:authorities="com.njpalmin.womencalendar.provider"/>
+        <provider android:name=".provider.WomenCalendarProvider"
+     		android:authorities="com.womencalendar.provider"/>
+        
         <activity android:name=".BMTChartActivity">
             <intent-filter>
-
             </intent-filter>
         </activity>
 		<activity android:name=".WomenCalendarDayActivity">

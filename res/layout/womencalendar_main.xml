@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/month_container"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
     android:background="#FFE77D89">
 
 	<LinearLayout android:orientation="vertical"
@@ -39,51 +39,49 @@
 			>
 		</LinearLayout>	  			
 	  	<LinearLayout android:orientation="horizontal"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:background="#FFF5F5F5">
 			<LinearLayout android:orientation="horizontal"
 				android:id="@+id/prev_container"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
 				android:layout_weight="1.0">
 				<ImageView android:id="@+id/prev"
-					android:paddingLeft="7.0dip"
-					android:paddingTop="3.0dip"
+					android:padding="10.0dip"
 					android:duplicateParentState="true"
 					android:layout_width="wrap_content"
-					android:layout_height="match_parent"
-					android:src="@drawable/previous_month_standard">
+					android:layout_height="wrap_content"
+					android:src="@drawable/previous_month">
 				</ImageView>
 			</LinearLayout>
-			<LinearLayout android:orientation="horizontal"
-				android:paddingTop="3.0dip"
-				android:paddingBottom="3.0dip"
+			<LinearLayout  android:orientation="vertical" 
+			    android:paddingTop="10.0dip"
+			    android:paddingBottom="10.0dip"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="0.0">
-				<TextView android:textSize="20.0sp"
-					android:textColor="#FF000000"
-					android:gravity="center"
+				<TextView android:textStyle="bold" 
+				    android:textColor="#ff000000" 
+				    android:gravity="center" 
 					android:id="@+id/month_title"
-					android:layout_width="match_parent"
+					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:text="00.00.0000">
 				</TextView>
 			</LinearLayout>
-			<LinearLayout android:gravity="right"
-				android:orientation="vertical"
+			<LinearLayout android:gravity="right" 
+			    android:orientation="horizontal"
 				android:id="@+id/next_container"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
 				android:layout_weight="1.0">
 				<ImageView android:id="@+id/next"
-					android:paddingTop="3.0dip"
-					android:paddingRight="7.0dip"
+					android:padding="10.0dip"
 					android:duplicateParentState="true"
 					android:layout_width="wrap_content"
-					android:layout_height="match_parent"
-					android:src="@drawable/next_month_standard">
+					android:layout_height="wrap_content"
+					android:src="@drawable/next_month">
 				</ImageView>
 			</LinearLayout>		
 	  	</LinearLayout>
