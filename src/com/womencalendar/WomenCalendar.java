@@ -44,7 +44,7 @@ public final class WomenCalendar {
         public static final String STRINGVALUE = "stringvalue";
         public static final String INTVALUE = "intvalue";
         
-        public static final String DEFAULT_SORT_ORDER = "date ASC";
+        public static final String DEFAULT_SORT_ORDER = "date DESC";
  
 	}   
 	

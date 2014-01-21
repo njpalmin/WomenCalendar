@@ -1,5 +1,6 @@
 package com.womencalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Activity;
@@ -11,7 +12,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -24,14 +24,16 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.womencalendar.WomenCalendar.Profile;
 import com.womencalendar.WomenCalendar.Record;
+import com.womencalendar.utils.DayOfMonthCursor;
 import com.womencalendar.utils.Utils;
-import com.womencalendar.view.WomenCalendarView;
+import com.womencalendar.view.WomenCalendarViewAdapter;
 
 public class WomenCalendarActivity extends Activity {
 	private static final String TAG = "WomenCalendarActivity";
@@ -58,8 +60,8 @@ public class WomenCalendarActivity extends Activity {
     private static final int DIALOG_STATISTICS = 7;
     private static final int DIALOG_SKINS = 8;
     
-	private WomenCalendarView mView;
-    private int mStartDay;
+    private Context mContext;
+	private GridView mView;
     private ContentResolver mContentResolver;
     private RecordObserver mRecordObserver = null;
     private ProfileObserver mProfileObserver = null;
@@ -72,8 +74,11 @@ public class WomenCalendarActivity extends Activity {
     private ImageView mPreMonthIV;
     private ImageView mNextMonthIV;
     private LinearLayout mCalendarLayout;
-    private Cursor mCursor;
+//    private DayOfMonthCursor mCursor;
+    private WomenCalendarViewAdapter mAdapter;
 //    private QueryHandler mQueryHandler;
+    
+    private ArrayList<Day> mStartDays;
 
     private static final int DAY_OF_WEEK_LABEL_IDS[] = {
         R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6
@@ -98,25 +103,22 @@ public class WomenCalendarActivity extends Activity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         
+        mContext = this;
         //LinearLayout mainLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.womencalendar_main, null);
         setContentView(R.layout.womencalendar_main);
         
         mContentResolver = getContentResolver();
 
         setRequestedOrientation(LinearLayout.VERTICAL);
-        SharedPreferences appShared = 
-                getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
-        mStartDay = appShared.getInt(Utils.SHARED_PREF_START_DAY, Calendar.getInstance().getFirstDayOfWeek());
         
         long now = System.currentTimeMillis();
-
         mTime = new Time();
         mTime.set(now);
         mTime.set(mTime.monthDay,mTime.month,mTime.year);
         mTime.normalize(true);
-       
+        
         // Get first day of week based on locale and populate the day headers
-        int diff = mStartDay - Calendar.SUNDAY - 1;
+        int diff = Utils.getStartDayOfWeek(mContext) - Calendar.SUNDAY - 1;
         for (int day = 0; day < 7; day++) {
             final String dayString = DateUtils.getDayOfWeekString(
                     (DAY_OF_WEEK_KINDS[day] + diff) % 7 + 1, DateUtils.LENGTH_MEDIUM);
@@ -178,15 +180,15 @@ public class WomenCalendarActivity extends Activity {
         // TODO Auto-generated method stub
         super.onResume();
     }
-
-    int getStartDay() {
-        return mStartDay;
-    }
     
     private void initView(){
-   		mCalendarLayout =(LinearLayout)findViewById(R.id.calendar_layout);
-        mView  = new WomenCalendarView(this,mTime,mCalendarLayout);
-   	    
+//   		mCalendarLayout =(LinearLayout)findViewById(R.id.calendar_layout);
+//        mView  = new WomenCalendarView(this,mTime,mCalendarLayout);
+//        DayOfMonthCursor cursor = new DayOfMonthCursor(mTime.year,  mTime.month, mTime.monthDay, Utils.getStartDayOfWeek(mContext));
+   		mView = (GridView)findViewById(R.id.calendar);
+   		mAdapter  = new WomenCalendarViewAdapter(mContext,caculateCalendarDays(),mTime);
+   		mView.setAdapter(mAdapter);
+   		
         mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
     	mBMTChartImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -231,8 +233,12 @@ public class WomenCalendarActivity extends Activity {
     }
     
     public void goToMonth(Time time){
+        mTime = time;
     	updateTitle(time);
-      	mView.reDrawView(time);
+    	mAdapter.setCalendarDays(caculateCalendarDays());
+//    	mAdapter.setTime(time);
+//    	mAdapter.notifyDataSetChanged();
+//      	mView.reDrawView(time);
     }
     /*
      * (non-Javadoc)
@@ -258,7 +264,7 @@ public class WomenCalendarActivity extends Activity {
 	            super.onChange(selfChange);
 	            //mCallLog.setStatusToChanged();
 	            //startQuery();
-	            mView.reDrawView(mTime);
+//	            mView.reDrawView(mTime);
 	        }catch (Exception e){
 	            Log.e(TAG, e.toString());
 	        }
@@ -278,7 +284,7 @@ public class WomenCalendarActivity extends Activity {
 	            super.onChange(selfChange);
 	            //mCallLog.setStatusToChanged();
 	            //startQuery();
-	            mView.reDrawView(mTime);
+//	            mView.reDrawView(mTime);
 	        }catch (Exception e){
 	            Log.e(TAG, e.toString());
 	        }
@@ -298,7 +304,7 @@ public class WomenCalendarActivity extends Activity {
 	            super.onChange(selfChange);
 	            //mCallLog.setStatusToChanged();
 	            //startQuery();
-	            mView.reDrawView(mTime);
+//	            mView.reDrawView(mTime);
 	        }catch (Exception e){
 	            Log.e(TAG, e.toString());
 	        }
@@ -494,4 +500,81 @@ public class WomenCalendarActivity extends Activity {
     	})
     	.create();
     }
+    
+    
+    ArrayList<Day> caculateCalendarDays(){
+        ArrayList<Day> calendarDays = new ArrayList<Day>();
+        ArrayList<Day> startDays = new ArrayList<Day>();
+        DayOfMonthCursor cursor = new DayOfMonthCursor(mTime.year,mTime.month,mTime.monthDay,Utils.getStartDayOfWeek(mContext));
+        
+        for(int i=0;i<42;i++){
+            Day day = new Day();
+            int dayOfMonth = cursor.getDayAt(i/7, i%7);
+            Time time = new Time();
+            time.set(dayOfMonth,cursor.getMonth(),cursor.getYear());
+            time.monthDay = i - cursor.getOffset() + 1;
+            time.normalize(true);
+            day.TIME = time;
+            if(isStartDay(day)){
+                day.DAYTYPE = Utils.DAY_TYPE_START;
+                day.mPeriodDay = 1;
+                startDays.add(day);
+            }
+            
+            Day startDay;
+            if(startDays.size() != 0){
+                startDay = startDays.get(startDays.size() - 1);
+            } else {
+                startDay = getLatestStartDay();
+            }
+            
+            if((day.TIME.toMillis(true) - startDay.TIME.toMillis(true)) < (Utils.getPeriodLength(mContext)-1)* Utils.DAY_IN_MILLIS &&
+                day.DAYTYPE != Utils.DAY_TYPE_START){
+                day.DAYTYPE = Utils.DAY_TYPE_IN_PERIOD;
+            } else if ((day.TIME.toMillis(true) - startDay.TIME.toMillis(true)) == (Utils.getPeriodLength(mContext) - 1) * Utils.DAY_IN_MILLIS){
+                day.DAYTYPE = Utils.DAY_TYPE_END;
+                day.mPeriodDay = Utils.getPeriodLength(mContext);
+            } else if(Utils.isInOvulation(mContext, startDay, day)) {
+                day.DAYTYPE = Utils.DAY_TYPE_OVULATION;
+            }
+            
+            calendarDays.add(day);
+        }   
+        
+        return calendarDays;
+    }
+    
+    Day getLatestStartDay(){
+        Cursor c = mContext.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "type=?",new String[]{Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        Day day = new Day();
+        if(c != null && c.getCount() != 0 ) {
+           c.moveToFirst();
+           String date = c.getString(c.getColumnIndex("date"));
+           Time time = new Time();
+           time.set(Utils.getMonthOfDayFromDate(date), Utils.getMonthFromDate(date) -1 , Utils.getYearFromDate(date));
+           time.normalize(true);
+           day.TIME = time;
+           day.DAYTYPE = Utils.DAY_TYPE_START;
+        }
+        c.close();
+       
+        return day;
+    }
+    
+    
+    
+    boolean isStartDay(Day day){
+        String date = day.getDate();
+        Cursor c = mContext.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "date=? and type=?",new String[]{date,Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        
+        if(c != null && c.getCount() != 0 ){
+            return true;
+        }
+        c.close();
+        return false;
+    }    
 }

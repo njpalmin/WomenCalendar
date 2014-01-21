@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.format.Time;
+import android.util.Log;
 
+import com.womencalendar.Day;
 import com.womencalendar.R;
 
 public class Utils {
@@ -48,7 +50,7 @@ public class Utils {
     
 	public final static int DAY_TYPE_NORMAL = 1;
 	public final static int DAY_TYPE_START = 2;
-	public final static int DAY_TYPE_MIDDLE = 3;
+	public final static int DAY_TYPE_IN_PERIOD = 3;
 	public final static int DAY_TYPE_END = 4;
 	public final static int DAY_TYPE_FERTILITY = 5;
 	public final static int DAY_TYPE_OVULATION = 6;
@@ -126,7 +128,18 @@ public class Utils {
     }
     
     public static int calculateFertilityEndPeriod(int cycleLength){
-    	return cycleLength - 10;
+    	return cycleLength - 11;
+    }
+    
+    public static boolean isInOvulation(Context context, Day startDay, Day today){
+        
+        if(today.TIME.toMillis(true) >= (startDay.TIME.toMillis(true) + (Utils.getCycleLength(context) - 18) * Utils.DAY_IN_MILLIS) 
+        && today.TIME.toMillis(true) <= (startDay.TIME.toMillis(true) + (Utils.getCycleLength(context) - 11) * Utils.DAY_IN_MILLIS)){
+            return true;
+            
+        }
+        
+        return false;
     }
     
     public static Time formatDateToTime(int date){
@@ -227,11 +240,11 @@ public class Utils {
     }
     
     public static int getMonthFromDate(String date){
-        return Integer.parseInt(date.substring(5,6));
+        return Integer.parseInt(date.substring(4,6));
     }    
     
     public static int getMonthOfDayFromDate(String date){
-        return Integer.parseInt(date.substring(7, 8));
+        return Integer.parseInt(date.substring(6));
     }
     
     

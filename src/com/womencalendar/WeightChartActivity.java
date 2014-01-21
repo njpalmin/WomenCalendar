@@ -80,7 +80,7 @@ public class WeightChartActivity extends AbstractImplChart {
 	    }
 	    
 	    renderer.setPointSize((float)3.5);
-	  renderer.setXLabels(XLABELS_NUMBER);
+	    renderer.setXLabels(XLABELS_NUMBER);
 	    renderer.setYLabels(YLABELS_NUMBER);
 	    renderer.setShowGrid(true);
 	    renderer.setXLabelsAlign(Align.LEFT);

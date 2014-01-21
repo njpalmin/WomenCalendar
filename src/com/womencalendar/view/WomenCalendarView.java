@@ -1,7 +1,6 @@
 package com.womencalendar.view;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -12,13 +11,15 @@ import android.graphics.Canvas;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 
 import com.womencalendar.DayInfo;
+import com.womencalendar.WomenCalendar.Record;
 import com.womencalendar.WomenCalendarActivity;
 import com.womencalendar.WomenCalendarDayActivity;
-import com.womencalendar.WomenCalendar.Record;
 import com.womencalendar.utils.DayOfMonthCursor;
 import com.womencalendar.utils.Utils;
 
@@ -158,15 +159,29 @@ public class WomenCalendarView extends View {
 		time.set(day,mCursor.getMonth(),mCursor.getYear());
 		time.monthDay = 7 * row + column - mCursor.getOffset() + 1;
 		time.normalize(true);
-		String date = time.format("%Y%M%D");
+//		String date = time.format("%Y%M%D");
+		
+		int startDay = mCursor.getDayAt(0,0);
+		int endDay = mCursor.getDayAt(6,7);
+		Time startTime = new Time();
+		startTime.set(startDay, mCursor.getMonth(),mCursor.getYear());
+        startTime.monthDay = 1- mCursor.getOffset();
+        startTime.normalize(true);
+	        
+        Time endTime = new Time();
+        endTime.set(endDay, mCursor.getMonth(),mCursor.getYear());
+        endTime.monthDay = 7 * 6 - mCursor.getOffset();
+        endTime.normalize(true);
 		
 		Cursor c = mContentResolver.query(Record.CONTENT_URI, RECORD_PROJECTION, 
-		           "date=? and type=?",new String[]{date,Utils.RECORD_TYPE_START},null);
+		           "date>? and date<? and type=?",
+		           new String[]{startTime.format("%Y%M%D"),endTime.format("%Y%M%D"),Utils.RECORD_TYPE_START},null);
 		
 		if(c != null && c.getCount() != 0 ){
+		    Log.d(TAG,"date = "+ c.getInt(c.getColumnIndex("date")));
 		    return Utils.DAY_TYPE_START;
 		}
-		
+		c.close();
 		/*
 		long millis = time.toMillis(true)/1000;
 		Log.d(TAG,"Day row="+ row+"|| column="+column+" || millis="+millis);
@@ -243,5 +258,4 @@ public class WomenCalendarView extends View {
     	
     	return notificationType;
     }
-
 }

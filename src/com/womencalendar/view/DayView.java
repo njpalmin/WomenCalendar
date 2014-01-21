@@ -113,12 +113,7 @@ public class DayView extends RelativeLayout{
             mDayOfMonth.setTypeface(Typeface.DEFAULT_BOLD);
         }
         
-        if (isStartDay(mDate)) {
-            this.setBackgroundResource(R.drawable.calendar_day_start_period_standard);
-        }
-        
         mDayOfMonth.setText(String.valueOf(mDay));
-        
     }
     
     private boolean isStartDay(String date) {

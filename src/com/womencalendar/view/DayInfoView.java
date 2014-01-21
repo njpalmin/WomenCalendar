@@ -116,7 +116,7 @@ public class DayInfoView extends RelativeLayout {
 			case Utils.DAY_TYPE_START:
 				mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_start_period_standard);
 				break;
-			case Utils.DAY_TYPE_MIDDLE:
+			case Utils.DAY_TYPE_IN_PERIOD:
 				mDayInfoLayout.setBackgroundResource(R.drawable.calendar_day_middle_period_standard);
 				break;
 			case Utils.DAY_TYPE_END:

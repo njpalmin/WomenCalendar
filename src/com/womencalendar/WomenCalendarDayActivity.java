@@ -93,7 +93,7 @@ public class WomenCalendarDayActivity extends Activity {
 		
 		mDate = getIntent().getStringExtra(Utils.EXTRAS_SELECTED_DAY);
 		mTime = new Time();
-		mTime.set(Utils.getMonthOfDayFromDate(mDate), Utils.getMonthFromDate(mDate), Utils.getYearFromDate(mDate));
+		mTime.set(Utils.getMonthOfDayFromDate(mDate), Utils.getMonthFromDate(mDate)-1, Utils.getYearFromDate(mDate));
 		
 		
 //		mRow = getIntent().getIntExtra(Utils.EVENT_ROW,-1);

@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/day"
     android:layout_width="wrap_content" 
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/calendar_day_standard">
     
     <TextView android:id="@+id/date"
         style="@style/WideWidgetText"
@@ -91,7 +92,8 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignRight="@+id/pill_notification"
 	    android:layout_alignTop="@+id/temperature"
-	    android:src="@drawable/calendar_symptoms" 
+	    android:layout_marginTop="3dip"
+	    android:src="@drawable/calendar_fertility" 
 	    android:visibility="invisible"/>
 	
 </RelativeLayout>
