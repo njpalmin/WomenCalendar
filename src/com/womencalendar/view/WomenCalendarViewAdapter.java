@@ -34,6 +34,7 @@ public class WomenCalendarViewAdapter extends BaseAdapter{
     private int mDay;
     private Time mToday,mTime;
     private ArrayList<Day> mCalendarDays;
+//    private ArrayList<Period> mPeriods;
     
     TextView mDayOfMonth;
     TextView mPeriodDay;
@@ -53,7 +54,8 @@ public class WomenCalendarViewAdapter extends BaseAdapter{
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return mCalendarDays.size();        
+        return mCalendarDays.size();  
+//        return 42;
     }
 
     @Override
@@ -80,34 +82,64 @@ public class WomenCalendarViewAdapter extends BaseAdapter{
         
         mDayOfMonth = (TextView)retView.findViewById(R.id.date);
         mPeriodDay = (TextView)retView.findViewById(R.id.period_day);
-        mSex = (ImageView)retView.findViewById(R.id.sex_notification);
-        mPill = (ImageView)retView.findViewById(R.id.pill_notification);
+        ImageView sex = (ImageView)retView.findViewById(R.id.sex_notification);
+        ImageView pill = (ImageView)retView.findViewById(R.id.pill_notification);
+        ImageView note = (ImageView)retView.findViewById(R.id.note_notification);
+        TextView  weight = (TextView)retView.findViewById(R.id.weight);
+        TextView  bmt = (TextView)retView.findViewById(R.id.temperature);
         mMood = (ImageView)retView.findViewById(R.id.mood_notification);
         mOther = (ImageView)retView.findViewById(R.id.others_notification);
         
-        Day day = mCalendarDays.get(position);
+        final Day day = mCalendarDays.get(position);
         if(cursor.isWithinCurrentMonth(position/7, position%7)){
-            retView.setBackgroundResource(R.drawable.calendar_day_standard);
+            retView.setBackgroundResource(R.drawable.calendar_day);
             
             if(day.DAYTYPE == Utils.DAY_TYPE_START) {
-                retView.setBackgroundResource(R.drawable.calendar_day_start_period_standard);
-                mPeriodDay.setVisibility(View.VISIBLE);
-                mPeriodDay.setText("("+day.mPeriodDay+")");
+                retView.setBackgroundResource(R.drawable.calendar_day_start_period);
+
             } else if (day.DAYTYPE == Utils.DAY_TYPE_IN_PERIOD) {
-                retView.setBackgroundResource(R.drawable.calendar_day_middle_period_standard);
+                retView.setBackgroundResource(R.drawable.calendar_day_middle_period);
             } else if (day.DAYTYPE ==  Utils.DAY_TYPE_END) {
-                retView.setBackgroundResource(R.drawable.calendar_day_end_period_standard);
-                mPeriodDay.setVisibility(View.VISIBLE);
-                mPeriodDay.setText("("+day.mPeriodDay+")");
+                retView.setBackgroundResource(R.drawable.calendar_day_end_period);
             } 
         }else {
-            retView.setBackgroundResource(R.drawable.calendar_day_other_standard);
+            retView.setBackgroundResource(R.drawable.calendar_day_other);
+        }
+        
+        if(day.mPeriodDay != 0){
+            mPeriodDay.setVisibility(View.VISIBLE);
+            mPeriodDay.setText("("+day.mPeriodDay+")");
+        }
+        
+        if (day.DAYTYPE == Utils.DAY_TYPE_FERTILITY) {
+            mOther.setVisibility(View.VISIBLE);
+            mOther.setImageResource(R.drawable.calendar_fertility);
         }
         
         if (day.DAYTYPE == Utils.DAY_TYPE_OVULATION) {
             mOther.setVisibility(View.VISIBLE);
-            mOther.setImageResource(R.drawable.calendar_fertility);
+            mOther.setImageResource(R.drawable.calendar_ovulation);
         }
+        
+        if ((day.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0) {
+            pill.setVisibility(View.VISIBLE);
+        } 
+        if((day.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_SEX) != 0) {
+            sex.setVisibility(View.VISIBLE);
+        }
+        if ((day.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0) {
+            weight.setVisibility(View.VISIBLE);
+            weight.setText(String.valueOf(day.weight));
+        } 
+        if ((day.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) != 0) {
+            bmt.setVisibility(View.VISIBLE);
+            bmt.setText(String.valueOf(day.bmt));
+        }
+        
+        if ((day.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) != 0) {
+            note.setVisibility(View.VISIBLE);
+        }
+        
         
         if (mDay == mToday.monthDay && cursor.getYear() == mToday.year
                 && cursor.getMonth() == mToday.month) {
@@ -122,6 +154,8 @@ public class WomenCalendarViewAdapter extends BaseAdapter{
                 String date = mCalendarDays.get(position).TIME.format("%Y%m%d");
                 Intent intent = new Intent(v.getContext(),WomenCalendarDayActivity.class);
                 intent.putExtra(Utils.EXTRAS_SELECTED_DAY, date);
+                intent.putExtra(Utils.EXTRAS_SELECTED_DAY_DAYTYPE,day.DAYTYPE);
+                intent.putExtra(Utils.EXTRAS_SELECTED_DAY_PERIOD_DAY, day.mPeriodDay);
                 mContext.startActivity(intent);                
             }
         });  

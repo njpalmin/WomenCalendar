@@ -17,6 +17,7 @@
 			android:id="@+id/prev_container"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:clickable="true"
 			android:layout_weight="1.0">
 			<ImageView android:id="@+id/prev"
 				android:paddingLeft="7.0dip"
@@ -45,6 +46,7 @@
 		<LinearLayout android:gravity="right"
 			android:orientation="vertical"
 			android:id="@+id/next_container"
+			android:clickable="true"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1.0">
@@ -74,6 +76,7 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="4.0dip"
 		android:layout_marginBottom="5.0dip"
+		android:visibility="gone"
 		android:text="@string/no_parameters">
 	</TextView>
 	<LinearLayout android:orientation="vertical"
@@ -183,7 +186,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:id="@+id/end_period"
-			android:clickable = "true"
+			android:clickable = "false"
 			android:layout_weight="1.0"
 			android:background="@drawable/action_button_background">
 			<LinearLayout android:orientation="horizontal"
@@ -226,7 +229,8 @@
 					android:layout_marginRight="6.0dip"
 					android:layout_marginTop="3.0dip"
 					android:layout_weight="1.0"
-					android:textStyle="bold">
+					android:textStyle="bold"
+					android:visibility="gone">
 				</TextView>
 			</LinearLayout>
 		</LinearLayout>

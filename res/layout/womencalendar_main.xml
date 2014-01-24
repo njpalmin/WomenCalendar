@@ -46,10 +46,12 @@
 				android:id="@+id/prev_container"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
+				android:clickable="true"
 				android:layout_weight="1.0">
 				<ImageView android:id="@+id/prev"
 					android:padding="10.0dip"
 					android:duplicateParentState="true"
+					android:clickable="true"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:src="@drawable/previous_month">
@@ -73,11 +75,13 @@
 			<LinearLayout android:gravity="right" 
 			    android:orientation="horizontal"
 				android:id="@+id/next_container"
+				android:clickable="true"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1.0">
 				<ImageView android:id="@+id/next"
 					android:padding="10.0dip"
+					android:clickable="true"
 					android:duplicateParentState="true"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"

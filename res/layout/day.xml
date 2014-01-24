@@ -3,7 +3,9 @@
 	android:id="@+id/day"
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content"
-    android:background="@drawable/calendar_day_standard">
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/calendar_day">
     
     <TextView android:id="@+id/date"
         style="@style/WideWidgetText"

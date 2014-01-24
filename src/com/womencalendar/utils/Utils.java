@@ -1,15 +1,17 @@
 package com.womencalendar.utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.text.format.Time;
-import android.util.Log;
 
 import com.womencalendar.Day;
 import com.womencalendar.R;
+import com.womencalendar.WomenCalendar.Record;
 
 public class Utils {
     private static final boolean DEBUG = true;
@@ -24,6 +26,8 @@ public class Utils {
     public static final String EVENT_DAY_TYPE = "dayType";
     public static final String EVENT_NOTIFICATION = "notification";
     public static final String EXTRAS_SELECTED_DAY = "extras_selected_day";
+    public static final String EXTRAS_SELECTED_DAY_DAYTYPE = "extras_selected_day_type";
+    public static final String EXTRAS_SELECTED_DAY_PERIOD_DAY = "extras_selected_day_period_day";
     
     public static final String EVENT_ROW = "row";
     public static final String EVENT_COLUMN = "column";
@@ -74,6 +78,16 @@ public class Utils {
     	OVULATION_DAY,
     	PERIOD_FORECAST_DAY
     }
+    
+    static final String[] RECORD_PROJECTION = new String[] {
+        Record._ID,
+        Record.PROFILEPK,
+        Record.DATE,
+        Record.TYPE,
+        Record.INTVALUE,
+        Record.FLOATVALUE,
+        Record.STRINGVALUE,
+    };
     
 //    public final static int DAY_TYPE_NORMAL_DAY = 1;
 //    public final static int DAY_TYPE_START_DAY = 2;
@@ -128,13 +142,13 @@ public class Utils {
     }
     
     public static int calculateFertilityEndPeriod(int cycleLength){
-    	return cycleLength - 11;
+    	return cycleLength - 10;
     }
     
     public static boolean isInOvulation(Context context, Day startDay, Day today){
         
         if(today.TIME.toMillis(true) >= (startDay.TIME.toMillis(true) + (Utils.getCycleLength(context) - 18) * Utils.DAY_IN_MILLIS) 
-        && today.TIME.toMillis(true) <= (startDay.TIME.toMillis(true) + (Utils.getCycleLength(context) - 11) * Utils.DAY_IN_MILLIS)){
+        && today.TIME.toMillis(true) <= (startDay.TIME.toMillis(true) + (Utils.getCycleLength(context) - 10) * Utils.DAY_IN_MILLIS)){
             return true;
             
         }
@@ -247,7 +261,304 @@ public class Utils {
         return Integer.parseInt(date.substring(6));
     }
     
+    public static ArrayList<Day> getCalendarDays(Time time, Context context){
+        ArrayList<Day> calendarDays = new ArrayList<Day>();
+        ArrayList<Day> startDays = new ArrayList<Day>();
+        DayOfMonthCursor cursor = new DayOfMonthCursor(time.year,time.month,time.monthDay,Utils.getStartDayOfWeek(context));
+        
+        for(int i=0;i<42;i++){
+            Day day = new Day();
+            int dayOfMonth = cursor.getDayAt(i/7, i%7);
+            Time t = new Time();
+            t.set(dayOfMonth,cursor.getMonth(),cursor.getYear());
+            t.monthDay = i - cursor.getOffset() + 1;
+            t.normalize(true);
+            day.TIME = t;
+            if(isStartDay(context,day)){
+                day.DAYTYPE = Utils.DAY_TYPE_START;
+                startDays.add(day);    
+            }
+            
+            Day startDay;
+            if(startDays.size() != 0){
+                startDay = startDays.get(startDays.size() - 1);
+            } else { //start day is in prev month
+                startDay = getLastStartDay(context,day);//getLatestStartDay(context);
+            }
+            
+            if(startDay != null) {
+                if(day.TIME.toMillis(true) >= startDay.TIME.toMillis(true)){
+                    day.mPeriodDay = (int)((day.TIME.toMillis(true) - startDay.TIME.toMillis(true))/Utils.DAY_IN_MILLIS) +1;
+                }
+                
+                if(day.mPeriodDay < Utils.getPeriodLength(startDay, context)){
+                    day.DAYTYPE = Utils.DAY_TYPE_IN_PERIOD;
+                }
+                if(day.mPeriodDay == Utils.getPeriodLength(startDay, context)) {
+                    day.DAYTYPE = Utils.DAY_TYPE_END;
+                }
+                
+                if(day.mPeriodDay > (Utils.getCycleLength(context) - 18) &&
+                   day.mPeriodDay < (Utils.getCycleLength(context) - 10)){
+                    day.DAYTYPE = Utils.DAY_TYPE_FERTILITY;
+                }
+                
+                if(day.mPeriodDay == (Utils.getCycleLength(context) - 14)){
+                    day.DAYTYPE = Utils.DAY_TYPE_OVULATION;
+                }
+                
+                if(day.mPeriodDay > Utils.getCycleLength(context)) {
+                    day.mPeriodDay = 0;
+                    //calculate the next period
+                }
+            }
+
+            //get day notification
+            Cursor c = context.getContentResolver().query(Record.CONTENT_URI, RECORD_PROJECTION, 
+                    "date=? and type<>?", new String[]{day.getDate(),Utils.RECORD_TYPE_START}, 
+                     Record.DEFAULT_SORT_ORDER);
+            if(c != null && c.getCount() != 0) {
+                while(c.moveToNext()){
+                    if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_SEX)){
+                        day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_SEX;
+                    }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_PILL)){
+                        day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_PILL;
+                    }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_BMT)){
+                        day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_BMT;
+                        day.bmt = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+                    }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_WEIGHT)){
+                        day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_WEIGHT;
+                        day.weight = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+                    }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_NOTE)){
+                        day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_NOTE;
+                        day.note = c.getString(c.getColumnIndex(Record.STRINGVALUE));
+                    }
+                }
+            }
+            c.close();
+            
+            calendarDays.add(day);            
+        }
+        
+        return calendarDays;
+    }
+
+    public static Day getLastStartDay(Context context, Day day) {
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "date<? and type=?",new String[]{day.getDate(),Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        Day startDay = new Day();
+        if(c != null && c.getCount() != 0 ) {
+           c.moveToFirst();
+           String date = c.getString(c.getColumnIndex("date"));
+           Time time = new Time();
+           time.set(Utils.getMonthOfDayFromDate(date), Utils.getMonthFromDate(date) -1 , Utils.getYearFromDate(date));
+           time.normalize(true);
+           startDay.TIME = time;
+           startDay.DAYTYPE = Utils.DAY_TYPE_START;
+        }
+        c.close();
+       
+        return startDay.TIME != null?startDay:null ; 
+    }
     
+    public static Day getLatestStartDay(Context context){
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "type=?",new String[]{Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        Day day = new Day();
+        if(c != null && c.getCount() != 0 ) {
+           c.moveToFirst();
+           String date = c.getString(c.getColumnIndex("date"));
+           Time time = new Time();
+           time.set(Utils.getMonthOfDayFromDate(date), Utils.getMonthFromDate(date) -1 , Utils.getYearFromDate(date));
+           time.normalize(true);
+           day.TIME = time;
+           day.DAYTYPE = Utils.DAY_TYPE_START;
+        }
+        c.close();
+       
+        return day;
+    }
     
+    public static int getPeriodLength(Day startDay,Context context) {
+        String date = startDay.getDate();
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "date=? and type=?",new String[]{date,Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        
+        if(c != null && c.getCount() != 0 ){
+            c.moveToFirst();
+            int length = c.getInt(c.getColumnIndex("intvalue"));
+            c.close();
+            return length;
+        }
+        c.close();
+        return 0;
+    }
     
+    public static int getNotification(Day day, Context context) {
+        String date = day.getDate();
+        int notification = 0;
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "date=? and type!=?",new String[]{date,Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        if(c != null && c.getCount() != 0 ){
+            while(c.moveToNext()){
+                if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_SEX)){
+                    notification |= Utils.NOTIFICATION_TYPE_SEX;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_PILL)) {
+                    notification |= Utils.NOTIFICATION_TYPE_PILL;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_BMT)) {
+                    notification |= Utils.NOTIFICATION_TYPE_BMT;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_NOTE)) {
+                    notification |= Utils.NOTIFICATION_TYPE_NOTE;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_WEIGHT)) {
+                    notification |= Utils.NOTIFICATION_TYPE_WEIGHT;
+                }
+            }
+        }
+        c.close();
+        
+        return notification;
+    }
+    
+    public static boolean  isStartDay(Context context,Day day){
+        String date = day.getDate();
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI,RECORD_PROJECTION,
+                "date=? and type=?",new String[]{date,Utils.RECORD_TYPE_START},
+                Record.DEFAULT_SORT_ORDER);
+        
+        if(c != null && c.getCount() != 0 ){
+            c.close();
+            return true;
+        }
+        c.close();
+        return false;
+    }
+    
+    public static int getPeriodDay(Context context, Day day) { 
+        if(isStartDay(context,day)){
+            return 0;
+        }else {
+            Day startDay = getLastStartDay(context,day);
+            if(startDay == null)
+                return 0;
+            
+            return (int)((day.TIME.toMillis(true) - startDay.TIME.toMillis(true))/Utils.DAY_IN_MILLIS) +1;
+        }
+    }
+    
+    public static int getDayType(Day day, Context context) {
+        if(day.mPeriodDay == 0){
+            return Utils.DAY_TYPE_START;    
+        }else {
+            if(Utils.getLastStartDay(context, day) != null){
+                if(day.mPeriodDay  < Utils.getPeriodLength(Utils.getLastStartDay(context, day), context)){
+                    return  Utils.DAY_TYPE_IN_PERIOD;
+                }else if(day.mPeriodDay  == Utils.getPeriodLength(Utils.getLastStartDay(context, day), context)){
+                    return  Utils.DAY_TYPE_END;
+                }
+            }
+            if(day.mPeriodDay  > (Utils.getCycleLength(context) - 18) &&
+                    day.mPeriodDay  < (Utils.getCycleLength(context) - 10)){
+               return Utils.DAY_TYPE_FERTILITY;
+            }
+            
+            if(day.mPeriodDay  == (Utils.getCycleLength(context) - 14)){
+                return Utils.DAY_TYPE_OVULATION;
+            }                        
+            return Utils.DAY_TYPE_NORMAL;
+        }
+    }
+    
+    public static Day getDay(Context context, String date){
+        Time time = new Time();
+        time.set(Utils.getMonthOfDayFromDate(date), Utils.getMonthFromDate(date)-1, Utils.getYearFromDate(date));
+        Day day = new Day();
+        day.TIME = time;
+        day.DAYTYPE=  Utils.DAY_TYPE_NORMAL;
+        
+        if(isStartDay(context,day)){
+            day.mPeriodDay = 1;
+        }else {
+            Day startDay = getLastStartDay(context,day);
+            if(startDay == null){
+                day.mPeriodDay = 0;
+            }else {
+                day.mPeriodDay = (int)((day.TIME.toMillis(true) - startDay.TIME.toMillis(true))/Utils.DAY_IN_MILLIS) +1;
+            }
+        }
+        
+        if(day.mPeriodDay == 1){
+            day.DAYTYPE= Utils.DAY_TYPE_START;    
+        }else {
+            if(Utils.getLastStartDay(context, day) != null){
+                if(day.mPeriodDay  < Utils.getPeriodLength(Utils.getLastStartDay(context, day), context)){
+                    day.DAYTYPE= Utils.DAY_TYPE_IN_PERIOD;
+                }else if(day.mPeriodDay  == Utils.getPeriodLength(Utils.getLastStartDay(context, day), context)){
+                    day.DAYTYPE= Utils.DAY_TYPE_END;
+                }
+            }
+            if(day.mPeriodDay  > (Utils.getCycleLength(context) - 18) &&
+               day.mPeriodDay  < (Utils.getCycleLength(context) - 10)){
+                day.DAYTYPE=  Utils.DAY_TYPE_FERTILITY;
+            }
+            
+            if(day.mPeriodDay  == (Utils.getCycleLength(context) - 14)){
+               day.DAYTYPE = Utils.DAY_TYPE_OVULATION;
+            }                        
+        }
+        
+        //get day notification
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI, RECORD_PROJECTION, 
+                "date=? and type<>?", new String[]{date,Utils.RECORD_TYPE_START}, 
+                 Record.DEFAULT_SORT_ORDER);
+        if(c != null && c.getCount() != 0) {
+            while(c.moveToNext()){
+                if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_SEX)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_SEX;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_PILL)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_PILL;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_BMT)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_BMT;
+                    day.bmt = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_WEIGHT)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_WEIGHT;
+                    day.weight = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_NOTE)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_NOTE;
+                    day.note = c.getString(c.getColumnIndex(Record.STRINGVALUE));
+                }
+            }
+        }
+        c.close();
+        
+        return day;
+    }
+    
+    public static int getDayNotification(Context context, Day day){
+        int notification = 0;
+        Cursor c = context.getContentResolver().query(Record.CONTENT_URI, RECORD_PROJECTION, 
+                "date=? and type<>?", new String[]{day.getDate(),Utils.RECORD_TYPE_START}, 
+                 Record.DEFAULT_SORT_ORDER);
+        if(c != null && c.getCount() != 0) {
+            while(c.moveToNext()){
+                if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_SEX)){
+                    notification |= Utils.NOTIFICATION_TYPE_SEX;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_PILL)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_PILL;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_BMT)){
+                    day.DAYNOTIFICATION |= Utils.NOTIFICATION_TYPE_BMT;
+                    day.bmt = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_WEIGHT)){
+                    notification |= Utils.NOTIFICATION_TYPE_WEIGHT;
+                }else if(c.getString(c.getColumnIndex("type")).equals(Utils.RECORD_TYPE_NOTE)){
+                    notification |= Utils.NOTIFICATION_TYPE_NOTE;
+                }
+            }
+        }
+        c.close();
+        return notification;
+    }
 }

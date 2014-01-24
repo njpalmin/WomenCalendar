@@ -40,25 +40,12 @@ public class WomenCalendarDayActivity extends Activity {
     
     private Context mContext;
 	private Time mTime;
-    private int mDayType;
-    private int mNotification;
-	private int mPeriodLength;
-	private int mCycleLength;
+    private int mNotification;	
 	
-	
-    private ImageView mPreMonthIV;
-    private ImageView mNextMonthIV;
+    private ImageView mPreDay;
+    private ImageView mNextDay;
     
-    
-    private LinearLayout mStartPeriod;
-    private LinearLayout mEndPeriod;
-    private LinearLayout mPill;
-    private LinearLayout mBmt;
-    private LinearLayout mNote;
-    private LinearLayout mSex;
     private LinearLayout mCervicalMucus;
-    private LinearLayout mMood;
-    private LinearLayout mWeight;
     
     private AlertDialog mBmtDialog;
     private AlertDialog mNoteDialog;
@@ -72,17 +59,11 @@ public class WomenCalendarDayActivity extends Activity {
     private String mLocalTemperatureScale;
     private String mLocalWeightScale;
     
-    //private WomenCalendarDbAdapter mWCDbAdapter;
-    private Cursor mCursor;
     private ContentResolver mContentResolver;
-    private int mYearDay;
-    private String mSelection;
-    private String [] mSelectionArgs;
-    private int mRow = -1;
-    private int mColumn = -1;
     private long mMillis = 0;
     private long mProfilePK = -1;
     private String mDate;
+    private Day mDay;
     
 	@Override
     public void onCreate(Bundle icicle) {
@@ -92,167 +73,185 @@ public class WomenCalendarDayActivity extends Activity {
 		setRequestedOrientation(LinearLayout.VERTICAL);
 		
 		mDate = getIntent().getStringExtra(Utils.EXTRAS_SELECTED_DAY);
-		mTime = new Time();
-		mTime.set(Utils.getMonthOfDayFromDate(mDate), Utils.getMonthFromDate(mDate)-1, Utils.getYearFromDate(mDate));
+		mDay = Utils.getDay(mContext, mDate);
 		
-		
-//		mRow = getIntent().getIntExtra(Utils.EVENT_ROW,-1);
-//		mColumn = getIntent().getIntExtra(Utils.EVENT_COLUMN,-1);
-//		
-//		mMillis = getIntent().getLongExtra(Utils.EVENT_BEGIN_TIME, 0);
-//		mDayType = getIntent().getIntExtra(Utils.EVENT_DAY_TYPE, Utils.DAY_TYPE_NORMAL);
-//		mNotification = getIntent().getIntExtra(Utils.EVENT_NOTIFICATION, 0);
-//		
-//		mTime = new Time();
-//		mTime.set(mMillis);
-//		
 		mContentResolver = getContentResolver();
-//		mCursor = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
-//		if(mCursor != null){
-//			mCursor.moveToFirst();
-//			mProfilePK = mCursor.getLong(mCursor.getColumnIndex(Profile._ID));
-//			mCursor.close();
-//		}
-//		getCycleAndPeriodLength();
-//		getConfig();
+		getConfig();
 		initView();
 	}
 	
 	void initView(){
 		initHeaderView();
-		/*
-		mDate = Integer.parseInt(mTime.format(getString(R.string.date_format)));
 		
-		if(initHeaderView()){
-			TextView noParameters = (TextView)findViewById(R.id.no_parameters_label_view);
-			if(noParameters != null){
-				noParameters.setVisibility(View.GONE);
-			}
-		}
+		//init buttons
+		LinearLayout startPeriod =(LinearLayout)findViewById(R.id.start_period);
+		LinearLayout endPeriod =(LinearLayout)findViewById(R.id.end_period);
+		LinearLayout pill = (LinearLayout)findViewById(R.id.day_pill);
+		LinearLayout sex  = (LinearLayout)findViewById(R.id.day_sex);
+		LinearLayout mood = (LinearLayout)findViewById(R.id.day_mood);
+		LinearLayout bmt  = (LinearLayout)findViewById(R.id.day_bmt);
+		LinearLayout note = (LinearLayout)findViewById(R.id.day_note);
+		LinearLayout weight = (LinearLayout)findViewById(R.id.day_weight);
 		
-		switch (mDayType){
-			case Utils.DAY_TYPE_START_DAY:
-				LinearLayout endPeriod =(LinearLayout)findViewById(R.id.end_period);
-				endPeriod.setEnabled(false);
-				endPeriod.setClickable(false);
-			break;
-			default:
-				break;
+        TextView startAdd = (TextView)findViewById(R.id.day_start_period_add);
+        TextView endAdd = (TextView)findViewById(R.id.day_end_period_add);
+        TextView pillAdd = (TextView)findViewById(R.id.day_pill_add);
+        TextView sexAdd = (TextView)findViewById(R.id.day_sex_add);
+        TextView bmtAdd = (TextView)findViewById(R.id.day_bmt_add);
+        TextView weightAdd = (TextView)findViewById(R.id.day_weight_add);
+        TextView noteAdd = (TextView)findViewById(R.id.day_note_add);
+          
+        if(mDay.mPeriodDay >1 ){
+            endPeriod.setEnabled(true);
+            endPeriod.setClickable(true);
+            endAdd.setVisibility(View.VISIBLE);
+            endAdd.setText(R.string.add);
+        }
+        
+        if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_SEX) != 0) {
+            sexAdd.setText(R.string.remove);
+        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0) {
+            pillAdd.setText(R.string.remove);
+        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) !=  0) {
+            bmtAdd.setText(R.string.edit_remove);
+        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) !=  0) {
+            noteAdd.setText(R.string.edit_remove);
+        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0) {
+            weightAdd.setText(R.string.edit_remove);
+        }
+        
+		switch(mDay.DAYTYPE){
+            case Utils.DAY_TYPE_START:  
+                startAdd = (TextView)findViewById(R.id.day_start_period_add);
+                startAdd.setText(getString(R.string.remove)); 
+                endAdd.setVisibility(View.GONE);
+                break;
+            case Utils.DAY_TYPE_END:
+                endAdd = (TextView)findViewById(R.id.day_end_period_add);
+                endAdd.setText(getString(R.string.remove)); 
+                startAdd.setVisibility(View.GONE);
+                startPeriod.setEnabled(false);
+                startPeriod.setClickable(false);
+                break;
+            case Utils.DAY_TYPE_IN_PERIOD:
+                endAdd = (TextView)findViewById(R.id.day_end_period_add);
+                endAdd.setText(getString(R.string.add));
+                startAdd.setVisibility(View.GONE);
+                startPeriod.setEnabled(false);
+                startPeriod.setClickable(false);
+                break;
 		}
-		*/
-    	mPreMonthIV = (ImageView)findViewById(R.id.prev);
-    	mPreMonthIV.setOnClickListener(new View.OnClickListener() {
+
+    	mPreDay= (ImageView)findViewById(R.id.prev);
+    	mPreDay.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	mTime.monthDay -= 1;
-            	mTime.normalize(true);
-            	goToDay(mTime);
+                mDay.TIME.monthDay -= 1;
+                mDay.TIME.normalize(true);
+            	goToDay(mDay.TIME);
             }
         });
     	
-    	mNextMonthIV = (ImageView)findViewById(R.id.next);
-    	mNextMonthIV.setOnClickListener(new View.OnClickListener() {
+    	mNextDay = (ImageView)findViewById(R.id.next);
+    	mNextDay.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	mTime.monthDay += 1;
-            	mTime.normalize(true);
-            	goToDay(mTime);
+            	mDay.TIME.monthDay += 1;
+            	mDay.TIME.normalize(true);
+            	goToDay(mDay.TIME);
             }
         });
 		
-		mStartPeriod = (LinearLayout)findViewById(R.id.start_period);
-		mStartPeriod.setOnClickListener(new View.OnClickListener() {
+    	startPeriod.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v){
 				Log.d(TAG,"Start onClick");
-				ContentValues values = new ContentValues();
-				values.put(Record.PROFILEPK, 1);
-				values.put(Record.DATE, Integer.parseInt(mDate));
-				values.put(Record.TYPE, Utils.RECORD_TYPE_START);
-				values.put(Record.INTVALUE, Utils.getPeriodLength(mContext));
-				mContentResolver.insert(Record.CONTENT_URI, values);
+				TextView sAdd = (TextView)findViewById(R.id.day_start_period_add);
+				if(sAdd.getText().toString().equals(mContext.getResources().getString(R.string.add))){
+				    ContentValues values = new ContentValues();
+	                values.put(Record.PROFILEPK, 1);
+	                values.put(Record.DATE, Integer.parseInt(mDay.getDate()));
+	                values.put(Record.TYPE, Utils.RECORD_TYPE_START);
+	                values.put(Record.INTVALUE, Utils.getPeriodLength(mContext));
+	                mContentResolver.insert(Record.CONTENT_URI, values);    
+				}else if(sAdd.getText().toString().equals(mContext.getResources().getString(R.string.remove))){
+				    mContentResolver.delete(Record.CONTENT_URI, "date=?", new String[]{mDay.getDate()});
+				}
 				finish();
-//				long millis = mTime.toMillis(true);
-//				if(mDayType == Utils.DAY_TYPE_START_DAY){
-//            		mContentResolver.delete(Record.CONTENT_URI, Record.DATE + "=?" + " AND " + Record.TYPE + "=?", 
-//        					new String[]{String.valueOf(mMillis/1000),Utils.RECORD_TYPE_START});					
-//				}else{
-//					if(mProfilePK > 0){
-//						ContentValues values = new ContentValues();
-//						values.put(Record.PROFILEPK, mProfilePK);
-//						values.put(Record.DATE, mTime.toMillis(true)/1000);
-//						values.put(Record.TYPE, Utils.RECORD_TYPE_START);
-//						values.put(Record.INTVALUE, (mPeriodLength * Utils.DAY_IN_SECONDS)/*Integer.parseInt(endTime.format(getString(R.string.date_format)))*/);
-//						mContentResolver.insert(Record.CONTENT_URI,values);
-//					}
-//				}
-//				setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);
 			}
 		});
 
-		/*
-		mEndPeriod = (LinearLayout)findViewById(R.id.end_period);
-		mEndPeriod.setOnClickListener(new View.OnClickListener() {
+    	endPeriod.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v){
-				Log.d(TAG,"mStart onClick");
-				long millis = mTime.toMillis(true);
-				
-				mCursor = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
-		        if(mCursor != null){
-					long profilePk = -1;
-					int cycleLength =0;
-					mCursor.moveToFirst();
-					profilePk = mCursor.getLong(mCursor.getColumnIndex(Profile._ID));
-					cycleLength = mCursor.getInt(mCursor.getColumnIndex(Profile.CYCLELENGTH));
-		        
-					if(profilePk > 0){
-						ContentValues values = new ContentValues();
-						values.put(Record.PROFILEPK, profilePk);
-						values.put(Record.DATE, mDate);
-						values.put(Record.TYPE, Utils.RECORD_TYPE_START);
-						values.put(Record.INTVALUE, cycleLength);
-						mContentResolver.insert(Record.CONTENT_URI,values);
-					}
-		        }
-				setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);
+				Log.d(TAG,"end onClick");
+				TextView eAdd = (TextView)findViewById(R.id.day_end_period_add);
+				if(eAdd.getText().toString().equals(mContext.getResources().getString(R.string.add))){
+				    Day startDay = Utils.getLastStartDay(mContext, mDay);
+				    int length = (int)((mDay.TIME.toMillis(true) - startDay.TIME.toMillis(true)) / Utils.DAY_IN_MILLIS)+1;
+				    ContentValues values = new ContentValues();
+				    values.put(Record.INTVALUE, length);
+				    mContentResolver.update(Record.CONTENT_URI, values, "date=?", new String[]{startDay.getDate()});
+				}else if(eAdd.getText().toString().equals(mContext.getResources().getString(R.string.remove))){
+				    Day startDay = Utils.getLastStartDay(mContext, mDay);
+                    int length = (int)((mDay.TIME.toMillis(true) - startDay.TIME.toMillis(true)) / Utils.DAY_IN_MILLIS);
+                    ContentValues values = new ContentValues();
+                    values.put(Record.INTVALUE, length);
+                    mContentResolver.update(Record.CONTENT_URI, values, "date=?", new String[]{startDay.getDate()}); 
+				}
+				finish();
 			}
-		});*/
+		});
 		
-		mPill = (LinearLayout)findViewById(R.id.day_pill);
-		mPill.setOnClickListener(new View.OnClickListener() {
+		pill.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	long millis = mTime.toMillis(true);
-            	if((mNotification & Utils.NOTIFICATION_TYPE_PILL) != 0){
-            		mContentResolver.delete(Record.CONTENT_URI, Record.DATE + "=?" + " AND " + Record.TYPE + "=?", 
-            					new String[]{String.valueOf(mMillis/1000),Utils.RECORD_TYPE_PILL});
-            	}else{
-    				ContentValues values = new ContentValues();
-    				values.put(Record.PROFILEPK, mProfilePK);
-    				values.put(Record.DATE, mMillis/1000);
-    				values.put(Record.TYPE, Utils.RECORD_TYPE_PILL);
-    				mContentResolver.insert(Record.CONTENT_URI,values);
-            	}
-				setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);  
+                TextView add = (TextView)findViewById(R.id.day_pill_add);
+                if(add.getText().toString().equals(mContext.getResources().getString(R.string.add))){
+                    ContentValues values = new ContentValues();
+                    values.put(Record.PROFILEPK, 1);
+                    values.put(Record.DATE, Integer.parseInt(mDay.getDate()));
+                    values.put(Record.TYPE, Utils.RECORD_TYPE_PILL);
+                    mContentResolver.insert(Record.CONTENT_URI, values);
+                }else if(add.getText().toString().equals(mContext.getResources().getString(R.string.remove))){
+                    mContentResolver.delete(Record.CONTENT_URI, "date=? and type=?", new String[]{mDay.getDate(),Utils.RECORD_TYPE_PILL});
+                }
+                finish();
             }
         });
 
-		
-		mBmt = (LinearLayout)findViewById(R.id.day_bmt);
-		mBmt.setOnClickListener(new View.OnClickListener() {
+        sex.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	//finish();
-            	long millis = mTime.toMillis(true);
-            	if((mNotification & Utils.NOTIFICATION_TYPE_BMT) != 0){
+                TextView add = (TextView)findViewById(R.id.day_sex_add);
+                if(add.getText().toString().equals(mContext.getResources().getString(R.string.add))){
+                    ContentValues values = new ContentValues();
+                    values.put(Record.PROFILEPK, 1);
+                    values.put(Record.DATE, Integer.parseInt(mDay.getDate()));
+                    values.put(Record.TYPE, Utils.RECORD_TYPE_SEX);
+                    mContentResolver.insert(Record.CONTENT_URI, values);
+                }else if(add.getText().toString().equals(mContext.getResources().getString(R.string.remove))){
+                    mContentResolver.delete(Record.CONTENT_URI, "date=? and type=?", new String[]{mDay.getDate(),Utils.RECORD_TYPE_SEX});
+                }
+                finish();          
+            }
+        });
+        
+
+        mood.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //finish();
+            }
+        });
+		
+		bmt.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) != 0){
             		showDialog(DIALOG_REMOVE_BMT);
             	}else {
             		showDialog(DIALOG_ADD_BMT);
             	}
-            	//setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);  
             }
         });
 		
-		mNote = (LinearLayout)findViewById(R.id.day_note);
-		mNote.setOnClickListener(new View.OnClickListener() {
+		note.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//finish();
-            	if((mNotification & Utils.NOTIFICATION_TYPE_NOTE) != 0){
+            	if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) != 0){
             		showDialog(DIALOG_REMOVE_NOTE);
             	}else{
             		showDialog(DIALOG_ADD_NOTE);
@@ -260,43 +259,11 @@ public class WomenCalendarDayActivity extends Activity {
             }
         });
 		
-		mSex = (LinearLayout)findViewById(R.id.day_sex);
-		mSex.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	long millis = mTime.toMillis(true);
-            	if((mNotification & Utils.NOTIFICATION_TYPE_SEX) != 0 ){
-            		mContentResolver.delete(Record.CONTENT_URI, Record.DATE + "=?" + " AND " + Record.TYPE + "=?", 
-            					new String[]{String.valueOf(mMillis/1000),Utils.RECORD_TYPE_SEX});
-            	}else{
-    				ContentValues values = new ContentValues();
-    				values.put(Record.PROFILEPK, mProfilePK);
-    				values.put(Record.DATE, mMillis/1000);
-    				values.put(Record.TYPE, Utils.RECORD_TYPE_SEX);
-    				mContentResolver.insert(Record.CONTENT_URI,values);
-            	}
-				setIntentAndFinish(true, millis,Utils.OPERATION_ADD_PARAMETER);  
-            }
-        });
-		
-		mCervicalMucus = (LinearLayout)findViewById(R.id.day_cervical_mucus);
-		mCervicalMucus.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	//finish();
-            }
-        });
-		
-		mMood = (LinearLayout)findViewById(R.id.day_mood);
-		mMood.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	//finish();
-            }
-        });
 
-		mWeight = (LinearLayout)findViewById(R.id.day_weight);
-		mWeight.setOnClickListener(new View.OnClickListener() {
+		weight.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//finish();
-            	if((mNotification & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
+            	if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
             		showDialog(DIALOG_REMOVE_WEIGHT);
             	}else{
             		showDialog(DIALOG_ADD_WEIGHT);
@@ -304,6 +271,14 @@ public class WomenCalendarDayActivity extends Activity {
             }
         });
 		
+		mCervicalMucus = (LinearLayout)findViewById(R.id.day_cervical_mucus);
+		mCervicalMucus.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+		        //finish();
+		    }
+		});
+    
+	        
 		mBack = (Button)findViewById(R.id.back);
 		mBack.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -329,9 +304,8 @@ public class WomenCalendarDayActivity extends Activity {
     } 
     
     private void  initHeaderView(){
-        updateTitle(mTime);
+        updateTitle(mDay.TIME);
     	LinearLayout dayInfoLayout = (LinearLayout)findViewById(R.id.date_info_layout);
-    	
     	
     	if(dayInfoLayout != null){
     		dayInfoLayout.removeAllViews();
@@ -340,84 +314,63 @@ public class WomenCalendarDayActivity extends Activity {
     		TextView paramsDescription = (TextView)findViewById(R.id.parameter_description_text_view);
     		TextView noParameter = (TextView)findViewById(R.id.no_parameters_label_view);
     		
-//    		switch (mDayType){
-//    			case Utils.DAY_TYPE_START_DAY:
-//    			case Utils.DAY_TYPE_MIDDLE_DAY:
-//    	    		ImageView startPeriod = new ImageView(this);
-//    	    		startPeriod.setImageResource(R.drawable.day_start_period);
-//    	    		dayInfoLayout.addView(startPeriod); 
-//    	    		TextView startAdd = (TextView)findViewById(R.id.day_start_period_add);
-//    	    		startAdd.setText(getString(R.string.remove)); 
-//    	    	break;
-//    			case Utils.DAY_TYPE_END_DAY:
-//    	    		ImageView endPeriod = new ImageView(this);
-//    	    		endPeriod.setImageResource(R.drawable.day_end_period);
-//    	    		dayInfoLayout.addView(endPeriod);
-//    	    	break;
-//    			case Utils.DAY_TYPE_FERTILITY_DAY:
-//    	    		ImageView fertilityDay = new ImageView(this);
-//    	    		fertilityDay.setImageResource(R.drawable.day_fertility);
-//    	    		dayInfoLayout.addView(fertilityDay);
-//    	    		paramsDescription.setVisibility(View.VISIBLE);
-//    	    		paramsDescription.setText(getString(R.string.fertility_forecast));
-//    	    		noParameter.setVisibility(View.GONE);
-//    	    	break;
-//    			case Utils.DAY_TYPE_OVULATION_DAY:
-//    	    		ImageView ovulationDay = new ImageView(this);
-//    	    		ovulationDay.setImageResource(R.drawable.day_ovulation);
-//    	    		dayInfoLayout.addView(ovulationDay);
-//    	    		paramsDescription.setVisibility(View.VISIBLE);
-//    	    		paramsDescription.setText(getString(R.string.ovulation_forecast));
-//    	    		noParameter.setVisibility(View.GONE);
-//    				break;
-//    			case Utils.DAY_TYPE_FORECAST_DAY:
-//    	    		ImageView forecastDay = new ImageView(this);
-//    	    		forecastDay.setImageResource(R.drawable.day_start_period_forecast);
-//    	    		dayInfoLayout.addView(forecastDay);
-//    	    	break;    	    	
-//    			case Utils.DAY_TYPE_NORMAL_DAY:
-//    			default:
-//    				break;
-//    			
-//    		}
+    		switch (mDay.DAYTYPE){
+    			case Utils.DAY_TYPE_START:
+    			case Utils.DAY_TYPE_IN_PERIOD:
+    			    ImageView startPeriod = new ImageView(this);
+    			    startPeriod.setImageResource(R.drawable.day_start_period);
+    			    dayInfoLayout.addView(startPeriod); 
+    			    break;
+    			case Utils.DAY_TYPE_END:
+    			    ImageView endPeriod = new ImageView(this);
+    			    endPeriod.setImageResource(R.drawable.day_end_period);
+    			    dayInfoLayout.addView(endPeriod);
+    			    break;
+                case Utils.DAY_TYPE_FERTILITY:
+                    ImageView fertilityDay = new ImageView(this);
+                    fertilityDay.setImageResource(R.drawable.day_fertility);
+                    dayInfoLayout.addView(fertilityDay);
+                    paramsDescription.setVisibility(View.VISIBLE);
+                    paramsDescription.setText(getString(R.string.fertility_forecast));
+                    noParameter.setVisibility(View.GONE);
+                break;
+                case Utils.DAY_TYPE_OVULATION:
+                    ImageView ovulationDay = new ImageView(this);
+                    ovulationDay.setImageResource(R.drawable.day_ovulation);
+                    dayInfoLayout.addView(ovulationDay);
+                    paramsDescription.setVisibility(View.VISIBLE);
+                    paramsDescription.setText(getString(R.string.ovulation_forecast));
+                    noParameter.setVisibility(View.GONE);
+                    break;
+    		}
     		
-    		if((mNotification & Utils.NOTIFICATION_TYPE_PILL) != 0){
+    		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0){
 				ImageView pill = new ImageView(this);
 				pill.setImageResource(R.drawable.day_pill);
 	    		dayInfoLayout.addView(pill);
-	    		TextView pillAdd = (TextView)findViewById(R.id.day_pill_add);
-	    		pillAdd.setText(getString(R.string.remove));
     		}
     		
-    		if((mNotification & Utils.NOTIFICATION_TYPE_SEX) != 0){
+    		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_SEX) != 0){
 				ImageView sex = new ImageView(this);
 				sex.setImageResource(R.drawable.day_sex);
 	    		dayInfoLayout.addView(sex);
-	    		TextView sexAdd = (TextView)findViewById(R.id.day_sex_add);
-	    		sexAdd.setText(getString(R.string.remove)); 
     		}
     		
-    		if((mNotification & Utils.NOTIFICATION_TYPE_BMT) != 0){
+    		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) != 0){
     			TextView bmt = new TextView(this);
     			bmt.setText(String.valueOf(getBmtValue()));
     			dayInfoLayout.addView(bmt);
-	    		TextView bmtAdd = (TextView)findViewById(R.id.day_bmt_add);
-	    		bmtAdd.setText(getString(R.string.edit_remove));     			
     		}
     		
-    		if((mNotification & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
+    		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0){
     			TextView weight = new TextView(this);
     			weight.setText(String.valueOf(getWeightValue()));
-    			dayInfoLayout.addView(weight);
-	    		TextView weightAdd = (TextView)findViewById(R.id.day_weight_add);
-	    		weightAdd.setText(getString(R.string.edit_remove));     			
+    			dayInfoLayout.addView(weight);   			
     		}
     		
-    		if((mNotification & Utils.NOTIFICATION_TYPE_NOTE) != 0){
+    		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) != 0){
 	    		TextView noteAdd = (TextView)findViewById(R.id.day_note_add);
 	    		noteAdd.setText(getString(R.string.edit_remove));
-	    		
-
 	    		noParameter.setVisibility(View.GONE); 
 	    		
 	    		LinearLayout noteLayout = (LinearLayout)findViewById(R.id.note_layout);
@@ -475,22 +428,11 @@ public class WomenCalendarDayActivity extends Activity {
     
     private void goToDay(Time time){
     	updateTitle(time);
-    	mTime = time;
+    	mDay = Utils.getDay(mContext, time.format("%Y%m%d"));
     	initView();
     }
     
-    private void getCycleAndPeriodLength(){
-    	Cursor c = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
-    	if(c != null){
-    		c.moveToFirst();
-    		mCycleLength = c.getInt(c.getColumnIndex(Profile.CYCLELENGTH));
-    		mPeriodLength = c.getInt(c.getColumnIndex(Profile.PERIODLENGTH));
-    	}
-    	c.close();
-    }
-    
     private Dialog createBmtAddDialog(){
-    	
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
         
@@ -546,7 +488,7 @@ public class WomenCalendarDayActivity extends Activity {
 				String floatValue = ev.getText().toString();
 				ContentValues values = new ContentValues();
 				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
 				
 				if(!mLocalTemperatureScale.equals(mTemperatureScale)){
@@ -558,8 +500,7 @@ public class WomenCalendarDayActivity extends Activity {
 				}
 				values.put(Record.FLOATVALUE, floatValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish(); 
 			}
     		
     	})
@@ -593,13 +534,13 @@ public class WomenCalendarDayActivity extends Activity {
 		        //EditText ev = (EditText)editEntryView.findViewById(R.id.note_value);
 				String stringValue = ev.getText().toString();
 				ContentValues values = new ContentValues();
-				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.PROFILEPK, 1);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
 				values.put(Record.STRINGVALUE, stringValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish();
+//				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
 			}
     		
     	})
@@ -668,8 +609,8 @@ public class WomenCalendarDayActivity extends Activity {
 		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
 				String floatValue = ev.getText().toString();
 				ContentValues values = new ContentValues();
-				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.PROFILEPK, 1);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
 				
 				if(!mLocalWeightScale.equals(mWeightScale)){
@@ -681,8 +622,7 @@ public class WomenCalendarDayActivity extends Activity {
 				}
 				values.put(Record.FLOATVALUE, floatValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish();
 			}
     		
     	})
@@ -752,8 +692,8 @@ public class WomenCalendarDayActivity extends Activity {
 		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
 				String floatValue = ev.getText().toString();
 				ContentValues values = new ContentValues();
-				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.PROFILEPK, 1);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
 
 				
@@ -767,8 +707,7 @@ public class WomenCalendarDayActivity extends Activity {
 				}
 				values.put(Record.FLOATVALUE, floatValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish(); 
 			}
     		
     	})
@@ -787,9 +726,8 @@ public class WomenCalendarDayActivity extends Activity {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// TODO Auto-generated method stub
 				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
-						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_WEIGHT});
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+						new String[]{mDay.getDate(), Utils.RECORD_TYPE_WEIGHT});
+				finish(); 
 			}
     		
     	})
@@ -817,15 +755,14 @@ public class WomenCalendarDayActivity extends Activity {
 				
 				ContentValues values = new ContentValues();
 				
-				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.PROFILEPK, 1);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
 				values.put(Record.STRINGVALUE, floatValue);
 
 				mContentResolver.update(Record.CONTENT_URI,values,where, 
 										new String[]{Utils.RECORD_TYPE_NOTE,String.valueOf(mMillis/1000)});
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish(); 
 			}
     		
     	})
@@ -844,9 +781,8 @@ public class WomenCalendarDayActivity extends Activity {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// TODO Auto-generated method stub
 				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
-						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_NOTE});
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+						new String[]{mDay.getDate(), Utils.RECORD_TYPE_NOTE});
+				finish(); 
 			}
     		
     	})
@@ -906,11 +842,10 @@ public class WomenCalendarDayActivity extends Activity {
 		        EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
 				String floatValue = ev.getText().toString();
 				ContentValues values = new ContentValues();
-				values.put(Record.PROFILEPK, mProfilePK);
-				values.put(Record.DATE, mMillis/1000);
+				values.put(Record.PROFILEPK, 1);
+				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
 
-				
 				if(!mLocalTemperatureScale.equals(mTemperatureScale)){
 					if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
 						//floatValue = Utils.celsiusToK(Utils.fahrenheitToCelsius(floatValue));
@@ -921,8 +856,8 @@ public class WomenCalendarDayActivity extends Activity {
 				}
 				values.put(Record.FLOATVALUE, floatValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+				finish();
+
 			}
     		
     	})
@@ -941,9 +876,8 @@ public class WomenCalendarDayActivity extends Activity {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// TODO Auto-generated method stub
 				mContentResolver.delete(Record.CONTENT_URI,Record.DATE + "=? AND " + Record.TYPE+ "=?", 
-						new String[]{String.valueOf(mMillis/1000), Utils.RECORD_TYPE_BMT});
-				//finish();
-				setIntentAndFinish(true,  mMillis,Utils.OPERATION_ADD_PARAMETER); 
+						new String[]{mDay.getDate(), Utils.RECORD_TYPE_BMT});
+				finish(); 
 			}
     		
     	})
@@ -986,5 +920,33 @@ public class WomenCalendarDayActivity extends Activity {
 	    		mLocalWeightScale = mWeightScale;
     		}
     	}
+    }
+    
+    private void addRecord(Day day, String type, Object value){
+        ContentValues values = new ContentValues();
+        values.put(Record.PROFILEPK, 1);
+        values.put(Record.DATE, day.getDate());
+        if(type.equals(Utils.RECORD_TYPE_START)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_START);
+            values.put(Record.INTVALUE, Utils.getPeriodLength(mContext));
+//        }else if(type.equals(Utils.RECORD_TYPE_END)){
+//            Day startDay = Utils.getLastStartDay(mContext, day);
+//            int length = (int)((day.TIME.toMillis(true) - startDay.TIME.toMillis(true))/ Utils.DAY_IN_MILLIS) + 1;
+//            values.put(Record.INTVALUE, length); 
+        }else if(type.equals(Utils.RECORD_TYPE_SEX)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_SEX);
+        }else if(type.equals(Utils.RECORD_TYPE_PILL)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_PILL);
+        }else if(type.equals(Utils.RECORD_TYPE_BMT)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
+            values.put(Record.FLOATVALUE, (String)value);
+        }else if(type.equals(Utils.RECORD_TYPE_NOTE)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
+            values.put(Record.FLOATVALUE, (String)value);        
+        }else if(type.equals(Utils.RECORD_TYPE_WEIGHT)){
+            values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
+            values.put(Record.FLOATVALUE, (String)value);  
+        }
+
     }
 }
