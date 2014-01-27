@@ -186,12 +186,11 @@ public class WomenCalendarActivity extends Activity {
    		mAdapter  = new WomenCalendarViewAdapter(mContext,Utils.getCalendarDays(mTime,mContext),mTime);
    		mView.setAdapter(mAdapter);
    		
-        mBMTChartImageView = (ImageView)findViewById(R.id.top_bmt_chart);
-    	mBMTChartImageView.setOnClickListener(new View.OnClickListener() {
+   		ImageView bmtChart = (ImageView)findViewById(R.id.top_bmt_chart);
+   		bmtChart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(WomenCalendarActivity.this, BMTChartActivity.class);
                 startActivity(intent);
-                //startActivityForResult(intent,DAY_ACTIVITY_DETAILS);
             }
         });
     	

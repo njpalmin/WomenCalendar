@@ -246,7 +246,7 @@ public class Utils {
     
     public static int getStartDayOfWeek(Context context){
         SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
-        return prefs.getInt(Utils.SHARED_PREF_START_DAY, 0);
+        return prefs.getInt(Utils.SHARED_PREF_START_DAY, Calendar.SUNDAY);
     }
     
     public static int getYearFromDate(String date){
