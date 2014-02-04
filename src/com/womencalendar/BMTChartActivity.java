@@ -41,6 +41,7 @@ public class BMTChartActivity extends AbstractImplChart {
 	  private XYMultipleSeriesDataset dataset = null;
 	  private XYMultipleSeriesRenderer renderer = null;
 	  private String[] types = new String[] { BarChart.TYPE, LineChart.TYPE };
+	  private double bmtMaxValue, bmtMinValue;
   
 	  void initView(){
 	      CombinedXYChart bmtChart = new CombinedXYChart(dataset, renderer, types);
@@ -103,11 +104,13 @@ public class BMTChartActivity extends AbstractImplChart {
         	List<double[]> values = new ArrayList<double[]>();
         	List<long[]> days = new ArrayList<long[]>();
         	
+        	bmtMaxValue = BMT_MAX_VALUE;
+        	bmtMinValue = BMT_MIN_VALUE;
     	    ContentResolver resolver = getContentResolver();
     	    Cursor cursor = 
-    	    	resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_START + "'", null, Record.DATE + " ASC");
+    	    	resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.DAY_TYPE_START + "'", null, Record.DATE + " DESC");
     	    Cursor cursorOfBmt =
-    		    resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_BMT + "'", null, Record.DATE + " ASC");
+    		    resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_BMT + "'", null, Record.DATE + " DESC");
     	    
     	    try {    	
     	    	if (cursor != null) count = cursor.getCount();
@@ -122,21 +125,31 @@ public class BMTChartActivity extends AbstractImplChart {
 //    	    			time.set(((long)cursor.getInt(cursor.getColumnIndex(Record.DATE))) * 1000);
     	    			dates.get(0)[dataCount] = new Date(time.year - 1900, time.month, time.monthDay);
     	    			values.get(0)[dataCount] = BMT_MAX_VALUE;
-    	    			days.get(0)[dataCount] = cursor.getInt(cursor.getColumnIndex(Record.INTVALUE)) * 1000 / TimeSeries.DAY;
+//    	    			values.get(0)[dataCount] = cursor.getFloat(cursor.getColumnIndex(Record.FLOATVALUE));
+//    	    			if(cursor.getFloat(cursor.getColumnIndex(Record.FLOATVALUE)) > BMT_MAX_VALUE ){
+//    	    			    BmtMaxValue = values.get(0)[dataCount]; 	    			    
+//    	    			}
+    	    			days.get(0)[dataCount] = time.toMillis(true)/TimeSeries.DAY;//cursor.getInt(cursor.getColumnIndex(Record.INTVALUE)) * 1000 / TimeSeries.DAY;
     	    			dataCount++;
     	    		}
     	    	}
     	    	
     	    	if (cursorOfBmt != null) countOfBmt = cursorOfBmt.getCount();
     	    	if (countOfBmt != 0) {
-    	    		for (cursorOfBmt.moveToFirst(); !cursorOfBmt.isAfterLast(); cursorOfBmt.moveToNext()) {
+    	    		while(cursorOfBmt.moveToNext()) {
 //    	    			time.set(((long)cursorOfBmt.getInt(cursorOfBmt.getColumnIndex(Record.DATE))) * 1000);
     	    		    String date = cursorOfBmt.getString(cursor.getColumnIndex(Record.DATE));
                         time.set(Utils.getMonthOfDayFromDate(date), Utils.getMonthFromDate(date)-1 , Utils.getYearFromDate(date));
                         time.normalize(true);
+                        if(cursorOfBmt.getDouble(cursorOfBmt.getColumnIndex(Record.FLOATVALUE)) > bmtMaxValue) {
+                            bmtMaxValue = cursorOfBmt.getDouble(cursorOfBmt.getColumnIndex(Record.FLOATVALUE));
+                        }
+                        if(cursorOfBmt.getDouble(cursorOfBmt.getColumnIndex(Record.FLOATVALUE)) < bmtMinValue) {
+                            bmtMinValue = cursorOfBmt.getDouble(cursorOfBmt.getColumnIndex(Record.FLOATVALUE));
+                        }
+                        
     	    			BMTSeries.add(new Date(time.year - 1900, time.month, time.monthDay) ,
-    	    					cursorOfBmt.getFloat(cursorOfBmt.getColumnIndex(Record.FLOATVALUE)));
-    	    			
+    	    					cursorOfBmt.getFloat(cursorOfBmt.getColumnIndex(Record.FLOATVALUE)));			
     	    			dataCountOfBmt++;
     	    		}
     	    	}
@@ -162,7 +175,7 @@ public class BMTChartActivity extends AbstractImplChart {
     	    	
     	    	setChartSettings(renderer, dates.get(0)[0].getTime()/TimeSeries.DAY, 
     		    		dates.get(0)[0].getTime()/TimeSeries.DAY + XLABELS_NUMBER,
-    		    		BMT_MIN_VALUE, BMT_MAX_VALUE, Color.LTGRAY, Color.DKGRAY);
+    		    		bmtMinValue - 2.0, bmtMaxValue + 2.0, Color.LTGRAY, Color.DKGRAY);
     
     		    dataset = buildDateset(dates, days, values);
     		    dataset.addSeries(1, BMTSeries);

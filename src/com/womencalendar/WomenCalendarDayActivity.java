@@ -24,7 +24,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.womencalendar.WomenCalendar.Config;
-import com.womencalendar.WomenCalendar.Profile;
 import com.womencalendar.WomenCalendar.Record;
 import com.womencalendar.utils.Utils;
 
@@ -39,28 +38,21 @@ public class WomenCalendarDayActivity extends Activity {
     private static final int DIALOG_REMOVE_WEIGHT = 6;
     
     private Context mContext;
-	private Time mTime;
-    private int mNotification;	
 	
     private ImageView mPreDay;
     private ImageView mNextDay;
     
     private LinearLayout mCervicalMucus;
     
-    private AlertDialog mBmtDialog;
-    private AlertDialog mNoteDialog;
-    private AlertDialog mWeightDialog;
     
     private Button mRemoveAll;
     private Button mBack;
-    private boolean mHasRecord = false;
     private String mTemperatureScale;
     private String mWeightScale;
     private String mLocalTemperatureScale;
     private String mLocalWeightScale;
     
     private ContentResolver mContentResolver;
-    private long mMillis = 0;
     private long mProfilePK = -1;
     private String mDate;
     private Day mDay;
@@ -140,6 +132,7 @@ public class WomenCalendarDayActivity extends Activity {
                 startPeriod.setEnabled(false);
                 startPeriod.setClickable(false);
                 break;
+
 		}
 
     	mPreDay= (ImageView)findViewById(R.id.prev);
@@ -342,6 +335,18 @@ public class WomenCalendarDayActivity extends Activity {
                     paramsDescription.setText(getString(R.string.ovulation_forecast));
                     noParameter.setVisibility(View.GONE);
                     break;
+                case Utils.DAY_TYPE_PREDICT:
+                    ImageView predictDay = new ImageView(this);
+                    predictDay.setImageResource(R.drawable.day_start_period_forecast);
+                    dayInfoLayout.addView(predictDay);
+                    paramsDescription.setVisibility(View.VISIBLE);
+                    paramsDescription.setText(getString(R.string.automatic_forecast));
+                    noParameter.setVisibility(View.GONE);
+                    break;                    
+    		}
+    		
+    		if(mDay.DAYNOTIFICATION != 0){
+    		    noParameter.setVisibility(View.GONE);;
     		}
     		
     		if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0){
@@ -386,8 +391,8 @@ public class WomenCalendarDayActivity extends Activity {
     	float bmtValue = 0.0f;
     	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
     	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
-    									new String[]{Utils.RECORD_TYPE_BMT ,String.valueOf(mMillis/1000)},null);
-    	if(c != null){
+    									new String[]{Utils.RECORD_TYPE_BMT ,mDay.getDate()},null);
+    	if(c != null ){
     		if(c.getCount() != 0){
 	    		c.moveToFirst();
 	    		bmtValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
@@ -402,13 +407,13 @@ public class WomenCalendarDayActivity extends Activity {
     	float weightValue = 0.0f;
     	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
     	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
-    									new String[]{Utils.RECORD_TYPE_WEIGHT,String.valueOf(mMillis/1000)},null);
-    	if(c != null){
+    									new String[]{Utils.RECORD_TYPE_WEIGHT,mDay.getDate()},null);
+    	if(c != null && c.getCount() != 0){
     		c.moveToFirst();
     		weightValue = c.getFloat(c.getColumnIndex(Record.FLOATVALUE));
-    		c.close();
+
     	}
-    	
+        c.close();    	
     	return weightValue;
     }
     
@@ -416,13 +421,13 @@ public class WomenCalendarDayActivity extends Activity {
     	String noteValue = "";
     	String selection = Record.TYPE + "=?" + " AND " + Record.DATE + "=?";
     	Cursor c = mContentResolver.query(Record.CONTENT_URI,null,selection,
-    									 new String[]{Utils.RECORD_TYPE_NOTE,String.valueOf(mMillis/1000)},null);
-    	if(c != null){
+    									 new String[]{Utils.RECORD_TYPE_NOTE,mDay.getDate()},null);
+    	if(c != null && c.getCount() != 0){
     		c.moveToFirst();
     		noteValue = c.getString(c.getColumnIndex(Record.STRINGVALUE));
-    		c.close();
+
     	}
-    	
+        c.close();    	
     	return noteValue;
     }
     
@@ -761,7 +766,7 @@ public class WomenCalendarDayActivity extends Activity {
 				values.put(Record.STRINGVALUE, floatValue);
 
 				mContentResolver.update(Record.CONTENT_URI,values,where, 
-										new String[]{Utils.RECORD_TYPE_NOTE,String.valueOf(mMillis/1000)});
+										new String[]{Utils.RECORD_TYPE_NOTE,mDay.getDate()});
 				finish(); 
 			}
     		
@@ -920,33 +925,5 @@ public class WomenCalendarDayActivity extends Activity {
 	    		mLocalWeightScale = mWeightScale;
     		}
     	}
-    }
-    
-    private void addRecord(Day day, String type, Object value){
-        ContentValues values = new ContentValues();
-        values.put(Record.PROFILEPK, 1);
-        values.put(Record.DATE, day.getDate());
-        if(type.equals(Utils.RECORD_TYPE_START)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_START);
-            values.put(Record.INTVALUE, Utils.getPeriodLength(mContext));
-//        }else if(type.equals(Utils.RECORD_TYPE_END)){
-//            Day startDay = Utils.getLastStartDay(mContext, day);
-//            int length = (int)((day.TIME.toMillis(true) - startDay.TIME.toMillis(true))/ Utils.DAY_IN_MILLIS) + 1;
-//            values.put(Record.INTVALUE, length); 
-        }else if(type.equals(Utils.RECORD_TYPE_SEX)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_SEX);
-        }else if(type.equals(Utils.RECORD_TYPE_PILL)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_PILL);
-        }else if(type.equals(Utils.RECORD_TYPE_BMT)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_BMT);
-            values.put(Record.FLOATVALUE, (String)value);
-        }else if(type.equals(Utils.RECORD_TYPE_NOTE)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_NOTE);
-            values.put(Record.FLOATVALUE, (String)value);        
-        }else if(type.equals(Utils.RECORD_TYPE_WEIGHT)){
-            values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
-            values.put(Record.FLOATVALUE, (String)value);  
-        }
-
     }
 }

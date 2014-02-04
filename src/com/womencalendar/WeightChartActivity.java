@@ -40,7 +40,7 @@ public class WeightChartActivity extends AbstractImplChart {
     private XYMultipleSeriesDataset dataset = null;
     private XYMultipleSeriesRenderer renderer = null;
     private String[] types = new String[] { LineChart.TYPE };
-
+    private double weightMaxValue, weightMinValue;
   
     void initView(){
         CombinedXYChart weightChart = new CombinedXYChart(dataset, renderer, types);
@@ -100,9 +100,13 @@ public class WeightChartActivity extends AbstractImplChart {
         List<Date[]> dates = new ArrayList<Date[]>();
         List<double[]> values = new ArrayList<double[]>();
 
+        weightMaxValue = WEIGHT_MIN_VALUE;
+        weightMinValue = WEIGHT_MAX_VALUE;
+        
+       
         ContentResolver resolver = getContentResolver();
         Cursor cursor = 
-            resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_WEIGHT + "'", null, Record.DATE + " ASC");
+            resolver.query(Record.CONTENT_URI, null, Record.TYPE + "='" + Utils.RECORD_TYPE_WEIGHT + "'", null, Record.DATE + " DESC");
 
         try {    	
             if (cursor != null) count = cursor.getCount();
@@ -115,6 +119,13 @@ public class WeightChartActivity extends AbstractImplChart {
                     time.normalize(true);
                     dates.get(0)[dataCount] = new Date(time.year - 1900, time.month, time.monthDay);
                     values.get(0)[dataCount] = cursor.getFloat(cursor.getColumnIndex(Record.FLOATVALUE));
+                    if( values.get(0)[dataCount]  > weightMaxValue) {
+                        weightMaxValue =  values.get(0)[dataCount];
+                    }
+                    
+                    if( values.get(0)[dataCount] < weightMinValue) {
+                        weightMinValue = values.get(0)[dataCount]; 
+                    }
                     dataCount++;
                 }
             }
@@ -134,7 +145,7 @@ public class WeightChartActivity extends AbstractImplChart {
 
             setChartSettings(renderer, dates.get(0)[0].getTime()/TimeSeries.DAY, 
                     dates.get(0)[0].getTime()/TimeSeries.DAY + XLABELS_NUMBER,
-                    WEIGHT_MIN_VALUE, WEIGHT_MAX_VALUE, Color.LTGRAY, Color.DKGRAY);
+                    weightMinValue - 10.0, weightMaxValue + 10.0, Color.LTGRAY, Color.DKGRAY);
 
             dataset = buildDateset(dates, null, values);
             if (cursor != null) cursor.close();

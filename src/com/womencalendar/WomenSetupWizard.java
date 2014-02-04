@@ -1,5 +1,7 @@
 package com.womencalendar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -8,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -94,14 +97,14 @@ public class WomenSetupWizard extends Activity {
 		});
 		periodSetDialog = new AlertDialog.Builder(this).setTitle("2/5")
 			.setView(periodView)
-			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					welcomeDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -151,14 +154,14 @@ public class WomenSetupWizard extends Activity {
             }});
 		daySetDialog = new AlertDialog.Builder(this).setTitle("3/5")
 			.setView(daySetView)
-			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					periodSetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -187,11 +190,12 @@ public class WomenSetupWizard extends Activity {
 		
 		View lanSetView = factory.inflate(R.layout.lanset_dialog, null);
 		final RadioGroup localeGroup = (RadioGroup)lanSetView.findViewById(R.id.lan_group);
+        ArrayList<String> localeList = new ArrayList<String>(Arrays.asList(Resources.getSystem().getAssets().getLocales()));
 		final String[] locales = getAssets().getLocales();
-		for (int i = 1; i < locales.length; i++) {
+		for (int i = 1; i < localeList.size(); i++) {
 			RadioButton radioBtn = new RadioButton(this);
-			Locale locale = new Locale(locales[i]);
-			radioBtn.setText(locale.getDisplayName());
+			Locale locale = new Locale(localeList.get(i));
+			radioBtn.setText(locale.getDisplayLanguage());
 			radioBtn.setId(i);
 			localeGroup.addView(radioBtn);
 		}
@@ -208,14 +212,14 @@ public class WomenSetupWizard extends Activity {
 		});
 		localeSetDialog = new AlertDialog.Builder(this).setTitle("4/5")
 			.setView(lanSetView)
-			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					daySetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.next, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -235,14 +239,14 @@ public class WomenSetupWizard extends Activity {
 		});
 		
 		endDialog = new AlertDialog.Builder(this).setTitle("5/5").setMessage(R.string.first_run_finish_1)
-			.setPositiveButton(R.string.back, new DialogInterface.OnClickListener() {				
+			.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 					localeSetDialog.show();
 				}
 			})
-			.setNegativeButton(R.string.start_to_use_calendar, new DialogInterface.OnClickListener() {				
+			.setPositiveButton(R.string.start_to_use_calendar, new DialogInterface.OnClickListener() {				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();

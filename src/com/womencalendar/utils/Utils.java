@@ -14,7 +14,6 @@ import com.womencalendar.R;
 import com.womencalendar.WomenCalendar.Record;
 
 public class Utils {
-    private static final boolean DEBUG = true;
     private static final String TAG = "CalUtils";
     
     public static final String SHARED_PREF_CYCLE_LENGTH = "cycle_legnth";
@@ -58,6 +57,7 @@ public class Utils {
 	public final static int DAY_TYPE_END = 4;
 	public final static int DAY_TYPE_FERTILITY = 5;
 	public final static int DAY_TYPE_OVULATION = 6;
+	public final static int DAY_TYPE_PREDICT = 7;
     
 	public final static int NOTIFICATION_TYPE_START = 1<<0;
 	public final static int NOTIFICATION_TYPE_PILL = 1<<1;
@@ -88,16 +88,7 @@ public class Utils {
         Record.FLOATVALUE,
         Record.STRINGVALUE,
     };
-    
-//    public final static int DAY_TYPE_NORMAL_DAY = 1;
-//    public final static int DAY_TYPE_START_DAY = 2;
-//    public final static int DAY_TYPE_MIDDLE_DAY = 3;
-//    public final static int DAY_TYPE_END_DAY= 4;
-//    public final static int DAY_TYPE_FERTILITY_DAY = 5;
-//    public final static int DAY_TYPE_OVULATION_DAY = 6;
-//    public final static int DAY_TYPE_FORECAST_DAY = 7;
-//    
-    
+
     public static void startActivity(Context context, String className, long time) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -308,8 +299,10 @@ public class Utils {
                 }
                 
                 if(day.mPeriodDay > Utils.getCycleLength(context)) {
-                    day.mPeriodDay = 0;
-                    //calculate the next period
+                    if((day.mPeriodDay % Utils.getCycleLength(context)) < Utils.getPeriodLength(startDay, context) ){
+                        day.DAYTYPE = Utils.DAY_TYPE_PREDICT;
+                    }
+
                 }
             }
 
@@ -507,7 +500,13 @@ public class Utils {
             
             if(day.mPeriodDay  == (Utils.getCycleLength(context) - 14)){
                day.DAYTYPE = Utils.DAY_TYPE_OVULATION;
-            }                        
+            }
+            
+            if(day.mPeriodDay > Utils.getCycleLength(context)) {
+                if((day.mPeriodDay % Utils.getCycleLength(context)) < Utils.getPeriodLength(Utils.getLastStartDay(context, day), context) ){
+                    day.DAYTYPE = Utils.DAY_TYPE_PREDICT;
+                }
+            }
         }
         
         //get day notification

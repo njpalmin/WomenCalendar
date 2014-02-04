@@ -101,12 +101,14 @@ public class WomenCalendarViewAdapter extends BaseAdapter{
                 retView.setBackgroundResource(R.drawable.calendar_day_middle_period);
             } else if (day.DAYTYPE ==  Utils.DAY_TYPE_END) {
                 retView.setBackgroundResource(R.drawable.calendar_day_end_period);
-            } 
+            } else if (day.DAYTYPE == Utils.DAY_TYPE_PREDICT) {
+                retView.setBackgroundResource(R.drawable.calendar_day_period_forecast);
+            }
         }else {
             retView.setBackgroundResource(R.drawable.calendar_day_other);
         }
         
-        if(day.mPeriodDay != 0){
+        if(day.mPeriodDay != 0 && day.mPeriodDay <= Utils.getCycleLength(mContext)){
             mPeriodDay.setVisibility(View.VISIBLE);
             mPeriodDay.setText("("+day.mPeriodDay+")");
         }
