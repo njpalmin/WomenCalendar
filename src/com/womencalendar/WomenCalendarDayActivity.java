@@ -102,13 +102,17 @@ public class WomenCalendarDayActivity extends Activity {
         
         if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_SEX) != 0) {
             sexAdd.setText(R.string.remove);
-        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0) {
+        }
+        if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_PILL) != 0) {
             pillAdd.setText(R.string.remove);
-        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) !=  0) {
+        }
+        if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_BMT) !=  0) {
             bmtAdd.setText(R.string.edit_remove);
-        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) !=  0) {
+        }
+        if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_NOTE) !=  0) {
             noteAdd.setText(R.string.edit_remove);
-        } else if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0) {
+        }
+        if((mDay.DAYNOTIFICATION & Utils.NOTIFICATION_TYPE_WEIGHT) != 0) {
             weightAdd.setText(R.string.edit_remove);
         }
         
@@ -441,46 +445,46 @@ public class WomenCalendarDayActivity extends Activity {
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
         
-        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
-        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
-        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+//        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+//        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+//        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
         final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
         final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
         
-        unit1.setText(R.string.celsius);
-        unit2.setText(R.string.fahrenheit);
+//        unit1.setText(R.string.celsius);
+//        unit2.setText(R.string.fahrenheit);
+//        
+//        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				// TODO Auto-generated method stub
+//				if(checkedId == unit1.getId()){
+//					tv.setText(R.string.celsius_symbol);
+//					//ev.setText(R.string.default_value_in_celsius);
+//					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
+//					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
+//				}else if (checkedId == unit2.getId()){
+//					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
+//					tv.setText(R.string.fahrenheit_symbol);
+//					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
+//					//ev.setText(R.string.default_value_in_fahrenheit);
+//				}
+//			}
+//        	
+//        });
+//        
+//        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+//        	scale.check(unit2.getId());
+//        	tv.setText(R.string.fahrenheit_symbol);
+//        	ev.setText(R.string.default_value_in_fahrenheit);
+//        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+//        	scale.check(unit1.getId());
+//        	tv.setText(R.string.celsius_symbol);
+//        	ev.setText(R.string.default_value_in_celsius);
+//        }
         
-        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// TODO Auto-generated method stub
-				if(checkedId == unit1.getId()){
-					tv.setText(R.string.celsius_symbol);
-					//ev.setText(R.string.default_value_in_celsius);
-					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
-					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
-				}else if (checkedId == unit2.getId()){
-					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
-					tv.setText(R.string.fahrenheit_symbol);
-					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
-					//ev.setText(R.string.default_value_in_fahrenheit);
-				}
-			}
-        	
-        });
-        
-        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
-        	scale.check(unit2.getId());
-        	tv.setText(R.string.fahrenheit_symbol);
-        	ev.setText(R.string.default_value_in_fahrenheit);
-        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
-        	scale.check(unit1.getId());
-        	tv.setText(R.string.celsius_symbol);
-        	ev.setText(R.string.default_value_in_celsius);
-        }
-        
-        
+        tv.setText(R.string.celsius_symbol);
     	return new  AlertDialog.Builder(this)
     	.setTitle(R.string.temperature)
     	.setView(editEntryView)
@@ -566,42 +570,42 @@ public class WomenCalendarDayActivity extends Activity {
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
         
-        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
-        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
-        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+//        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+//        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+//        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
         final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
         final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
         
-        unit1.setText(R.string.kilogram);
-        unit2.setText(R.string.pound);
-        
-        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// TODO Auto-generated method stub
-				if(checkedId == unit1.getId()){
-					tv.setText(R.string.kg);
-					ev.setText(Utils.poundToKg(ev.getText().toString()));
-					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
-				}else if (checkedId == unit2.getId()){
-					mLocalTemperatureScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
-					tv.setText(R.string.lb);
-					ev.setText(Utils.kgToPound(ev.getText().toString()));
-					//ev.setText(R.string.default_value_in_fahrenheit);
-				}
-			}
-        	
-        });
-        
-        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
-        	scale.check(unit2.getId());
-        	tv.setText(R.string.kg);
-        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
-        	scale.check(unit1.getId());
-        	tv.setText(R.string.lb);
-        }
-        
+//        unit1.setText(R.string.kilogram);
+//        unit2.setText(R.string.pound);
+//        
+//        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				// TODO Auto-generated method stub
+//				if(checkedId == unit1.getId()){
+//					tv.setText(R.string.kg);
+//					ev.setText(Utils.poundToKg(ev.getText().toString()));
+//					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
+//				}else if (checkedId == unit2.getId()){
+//					mLocalTemperatureScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
+//					tv.setText(R.string.lb);
+//					ev.setText(Utils.kgToPound(ev.getText().toString()));
+//					//ev.setText(R.string.default_value_in_fahrenheit);
+//				}
+//			}
+//        	
+//        });
+//        
+//        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+//        	scale.check(unit2.getId());
+//        	tv.setText(R.string.kg);
+//        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+//        	scale.check(unit1.getId());
+//        	tv.setText(R.string.lb);
+//        }
+        tv.setText(R.string.kg);
         
     	return new  AlertDialog.Builder(this)
     	.setTitle(R.string.weight)
@@ -617,14 +621,14 @@ public class WomenCalendarDayActivity extends Activity {
 				values.put(Record.PROFILEPK, 1);
 				values.put(Record.DATE, mDay.getDate());
 				values.put(Record.TYPE, Utils.RECORD_TYPE_WEIGHT);
-				
-				if(!mLocalWeightScale.equals(mWeightScale)){
-					if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
-						floatValue = Utils.poundToKg(floatValue);
-					}else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
-						floatValue = Utils.celsiusToFahrenheit(floatValue);
-					}
-				}
+//				
+//				if(!mLocalWeightScale.equals(mWeightScale)){
+//					if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+//						floatValue = Utils.poundToKg(floatValue);
+//					}else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+//						floatValue = Utils.celsiusToFahrenheit(floatValue);
+//					}
+//				}
 				values.put(Record.FLOATVALUE, floatValue);
 				mContentResolver.insert(Record.CONTENT_URI,values);
 				finish();
@@ -648,43 +652,44 @@ public class WomenCalendarDayActivity extends Activity {
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
         
-        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
-        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
-        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+//        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+//        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+//        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
         final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
         final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
     
-        unit1.setText(R.string.kilogram);
-        unit2.setText(R.string.pound);
-        
-        
-        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// TODO Auto-generated method stub
-				if(checkedId == unit1.getId()){
-					tv.setText(R.string.kg);
-					ev.setText(Utils.poundToKg(ev.getText().toString()));
-					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
-				}else if (checkedId == unit2.getId()){
-					mLocalWeightScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
-					tv.setText(R.string.lb);
-					ev.setText(Utils.kgToPound(ev.getText().toString()));
-				}
-			}
-        	
-        });
-        
-        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
-        	scale.check(unit2.getId());
-        	tv.setText(R.string.kg);
-        	
-        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
-        	scale.check(unit1.getId());
-        	tv.setText(R.string.lb);
-        }
+//        unit1.setText(R.string.kilogram);
+//        unit2.setText(R.string.pound);
+//        
+//        
+//        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				// TODO Auto-generated method stub
+//				if(checkedId == unit1.getId()){
+//					tv.setText(R.string.kg);
+//					ev.setText(Utils.poundToKg(ev.getText().toString()));
+//					mLocalWeightScale = Utils.CONFIG_WEIGHT_KILOGRAM_SCALE;
+//				}else if (checkedId == unit2.getId()){
+//					mLocalWeightScale = Utils.CONFIG_WEIGHT_POUND_SCALE;
+//					tv.setText(R.string.lb);
+//					ev.setText(Utils.kgToPound(ev.getText().toString()));
+//				}
+//			}
+//        	
+//        });
+//        
+//        if(mWeightScale.equals(Utils.CONFIG_WEIGHT_KILOGRAM_SCALE)){
+//        	scale.check(unit2.getId());
+//        	tv.setText(R.string.kg);
+//        	
+//        }else if (mWeightScale.equals(Utils.CONFIG_WEIGHT_POUND_SCALE)){
+//        	scale.check(unit1.getId());
+//        	tv.setText(R.string.lb);
+//        }
         ev.setText(String.valueOf(getWeightValue()));
+        tv.setText(R.string.kg);
         
     	return new  AlertDialog.Builder(this)
     	.setTitle(R.string.weight)
@@ -799,42 +804,43 @@ public class WomenCalendarDayActivity extends Activity {
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_edit_entry, null);
         
-        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
-        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
-        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
+//        final RadioGroup  scale = (RadioGroup)editEntryView.findViewById(R.id.scale);
+//        final RadioButton unit1 = (RadioButton)editEntryView.findViewById(R.id.unit1);
+//        final RadioButton unit2 = (RadioButton)editEntryView.findViewById(R.id.unit2);
         final EditText ev = (EditText)editEntryView.findViewById(R.id.value_edit);
         final TextView tv = (TextView)editEntryView.findViewById(R.id.value_view);
         
-        unit1.setText(R.string.celsius);
-        unit2.setText(R.string.fahrenheit);
+//        unit1.setText(R.string.celsius);
+//        unit2.setText(R.string.fahrenheit);
+//        
+//        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				// TODO Auto-generated method stub
+//				if(checkedId == unit1.getId()){
+//					tv.setText(R.string.celsius_symbol);
+//					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
+//					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
+//				}else if (checkedId == unit2.getId()){
+//					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
+//					tv.setText(R.string.fahrenheit_symbol);
+//					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
+//				}
+//			}
+//        	
+//        });
         
-        scale.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// TODO Auto-generated method stub
-				if(checkedId == unit1.getId()){
-					tv.setText(R.string.celsius_symbol);
-					ev.setText(Utils.fahrenheitToCelsius(ev.getText().toString()));
-					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE;
-				}else if (checkedId == unit2.getId()){
-					mLocalTemperatureScale = Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE;
-					tv.setText(R.string.fahrenheit_symbol);
-					ev.setText(Utils.celsiusToFahrenheit(ev.getText().toString()));
-				}
-			}
-        	
-        });
-        
-        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
-        	scale.check(unit2.getId());
-        	tv.setText(R.string.fahrenheit_symbol);
-        	
-        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
-        	scale.check(unit1.getId());
-        	tv.setText(R.string.celsius_symbol);
-        }
+//        if(mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_FAHRENHEIT_SCALE)){
+//        	scale.check(unit2.getId());
+//        	tv.setText(R.string.fahrenheit_symbol);
+//        	
+//        }else if (mTemperatureScale.equals(Utils.CONFIG_TEMPERATURE_CELSIUS_SCALE)){
+//        	scale.check(unit1.getId());
+//        	tv.setText(R.string.celsius_symbol);
+//        }
         ev.setText(String.valueOf(getBmtValue()));
+        tv.setText(R.string.celsius_symbol);
         
     	return new  AlertDialog.Builder(this)
     	.setTitle(R.string.temperature)

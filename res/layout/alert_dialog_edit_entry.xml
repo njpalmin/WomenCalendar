@@ -24,7 +24,7 @@
 		    android:text="@string/fahrenheit"
 			android:textSize="30dip"/>
 	</LinearLayout>
-	<RadioGroup	 android:orientation="vertical"
+<!-- 	<RadioGroup	 android:orientation="vertical"
 		android:layout_height="fill_parent"
 		android:layout_width="wrap_content"
 		android:id="@+id/scale">
@@ -36,5 +36,5 @@
         <RadioButton android:id="@+id/unit2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-	</RadioGroup>
+	</RadioGroup> -->
 </LinearLayout>
