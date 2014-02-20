@@ -6,6 +6,7 @@ import java.util.Calendar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.text.format.Time;
 
@@ -230,14 +231,33 @@ public class Utils {
         return prefs.getInt(Utils.SHARED_PREF_CYCLE_LENGTH, 28);
     }
 
+    public static void setCycleLength(Context context, int length){
+        SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
+        Editor editor = prefs.edit();
+        editor.putInt(Utils.SHARED_PREF_CYCLE_LENGTH,length);
+        editor.commit();     
+    }
+    
     public static int getPeriodLength(Context context){
         SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
         return prefs.getInt(Utils.SHARED_PREF_PERIOD_LENGTH, 4);
     }
     
+    public static void setPeriodLength(Context context, int length){
+        SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
+        Editor editor = prefs.edit();
+        editor.putInt(Utils.SHARED_PREF_PERIOD_LENGTH,length);
+        editor.commit();     
+    }
+    
     public static int getStartDayOfWeek(Context context){
         SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
         return prefs.getInt(Utils.SHARED_PREF_START_DAY, Calendar.SUNDAY);
+    }
+    
+    public static String getLocale(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(null, Context.MODE_PRIVATE);
+        return prefs.getString(Utils.SHARED_PREF_LOCALE, "en_US");
     }
     
     public static int getYearFromDate(String date){

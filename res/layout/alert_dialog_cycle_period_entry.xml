@@ -49,7 +49,7 @@
 			android:maxLength="2" 
 			android:layout_alignParentRight="true"/>
 	</LinearLayout>
-	<LinearLayout  
+<!-- 	<LinearLayout  
 	  android:layout_width="match_parent"
 	  android:layout_height="wrap_content"
 	  android:orientation="horizontal"
@@ -60,5 +60,5 @@
 	  			android:text="@string/automatic_forecast" 
 	  			android:layout_gravity="center">
 		  </CheckBox>
-	</LinearLayout>
+	</LinearLayout> -->
 </LinearLayout>

@@ -1,6 +1,9 @@
 package com.womencalendar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +14,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -20,13 +26,17 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import com.womencalendar.WomenCalendar.Profile;
 import com.womencalendar.WomenCalendar.Record;
@@ -58,6 +68,7 @@ public class WomenCalendarActivity extends Activity {
     private static final int DIALOG_BACK_UP = 6;
     private static final int DIALOG_STATISTICS = 7;
     private static final int DIALOG_SKINS = 8;
+    private static final int DIALOG_SELECT_LOCALE = 9;
     
     private Context mContext;
 	private GridView mView;
@@ -229,6 +240,14 @@ public class WomenCalendarActivity extends Activity {
     }
     
     public void goToMonth(Time time){
+        int diff = Utils.getStartDayOfWeek(mContext) - Calendar.SUNDAY - 1;
+        for (int day = 0; day < 7; day++) {
+            final String dayString = DateUtils.getDayOfWeekString(
+                    (DAY_OF_WEEK_KINDS[day] + diff) % 7 + 1, DateUtils.LENGTH_MEDIUM);
+            final TextView label = (TextView) findViewById(DAY_OF_WEEK_LABEL_IDS[day]);
+            label.setText(dayString);
+            label.setTextColor(getResources().getColor(R.color.weekdays));
+        }
         mTime = time;
     	updateTitle(time);
     	mAdapter.setCalendarDays(Utils.getCalendarDays(mTime,mContext));
@@ -345,31 +364,31 @@ public class WomenCalendarActivity extends Activity {
 			mConfigObserver = null;
 		}		
 	}
-/*
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, MENU_CYCLE_PERIOD_LENGTH, 0, R.string.cycle_period_length)
         .setIcon(R.drawable.ic_menu_period_lenght);
 
-        menu.add(0, MENU_SKINS, 0, R.string.skins)
-        .setIcon(R.drawable.ic_menu_skins);
-
-        menu.add(0, MENU_SET_PASSWORD, 0, R.string.set_password)
-        .setIcon(R.drawable.ic_menu_password);
-
-        menu.add(0, MENU_NOTIFICATIONS, 0, R.string.notifications)
-        .setIcon(R.drawable.ic_menu_notifications);
+//        menu.add(0, MENU_SKINS, 0, R.string.skins)
+//        .setIcon(R.drawable.ic_menu_skins);
+//
+//        menu.add(0, MENU_SET_PASSWORD, 0, R.string.set_password)
+//        .setIcon(R.drawable.ic_menu_password);
+//
+//        menu.add(0, MENU_NOTIFICATIONS, 0, R.string.notifications)
+//        .setIcon(R.drawable.ic_menu_notifications);
 
         menu.add(0, MENU_HELP_ABOUT, 0, R.string.help_about_us)
         .setIcon(R.drawable.ic_menu_help);
 
         menu.add(0, MENU_SELECT_LOCALE, 0, R.string.choose_language);
         //.setIcon(R.drawable.ic_menu_period_lenght)
-        menu.add(0, MENU_TEMPERATURE_SCALE, 0, R.string.temperature);
+//        menu.add(0, MENU_TEMPERATURE_SCALE, 0, R.string.temperature);
         menu.add(0, MENU_WEEK_START, 0, R.string.week_starts_with);
-        menu.add(0, MENU_BACK_UP, 0, R.string.backup);
-        menu.add(0, MENU_STATISTICS, 0, R.string.statistics);
+//        menu.add(0, MENU_BACK_UP, 0, R.string.backup);
+//        menu.add(0, MENU_STATISTICS, 0, R.string.statistics);
         
         return true;
     }
@@ -379,57 +398,57 @@ public class WomenCalendarActivity extends Activity {
     	case MENU_CYCLE_PERIOD_LENGTH:
     		showDialog(DIALOG_CYCLE_PERIOD_LENGTH);
     		return true;
-    	case MENU_SKINS:
-    		showDialog(DIALOG_SKINS);
-    		return true;
-    	case MENU_SET_PASSWORD:
-    		showDialog(DIALOG_SKINS);
-    		return true;
-    	case MENU_NOTIFICATIONS:
-    		showDialog(DIALOG_SKINS);
-    		return true;
+//    	case MENU_SKINS:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
+//    	case MENU_SET_PASSWORD:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
+//    	case MENU_NOTIFICATIONS:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
     	case MENU_HELP_ABOUT:
     		showDialog(DIALOG_SKINS);
     		return true;
     	case MENU_SELECT_LOCALE:
-    		showDialog(DIALOG_SKINS);
+    		showDialog(DIALOG_SELECT_LOCALE);
     		return true;
-    	case MENU_TEMPERATURE_SCALE:
-    		showDialog(DIALOG_SKINS);
-    		return true;
+//    	case MENU_TEMPERATURE_SCALE:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
     	case MENU_WEEK_START:
-    		showDialog(DIALOG_SKINS);
+    		showDialog(DIALOG_WEEK_START);
     		return true;
-    	case MENU_BACK_UP:
-    		showDialog(DIALOG_SKINS);
-    		return true;
-    	case MENU_STATISTICS:
-    		showDialog(DIALOG_SKINS);
-    		return true;
+//    	case MENU_BACK_UP:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
+//    	case MENU_STATISTICS:
+//    		showDialog(DIALOG_SKINS);
+//    		return true;
     	default:
     		return super.onOptionsItemSelected(item);
     	}
     }
-*/
+
     @Override
     public Dialog onCreateDialog(int id) {
         switch (id) {
             case DIALOG_CYCLE_PERIOD_LENGTH:
                 return createCyclePeriodLengthDialog();
-            case DIALOG_SET_PASSWORD:
-            	return createRestrictionDialog();
-            case DIALOG_SELECT_SCALE:
-            	return createRestrictionDialog();
-            case DIALOG_TEMPERATURE_SCALE:
-            	return createRestrictionDialog();
+            case DIALOG_SELECT_LOCALE:
+            	return createSelectLocaleDialog();
+//            case DIALOG_SELECT_SCALE:
+//            	return createRestrictionDialog();
+//            case DIALOG_TEMPERATURE_SCALE:
+//            	return createRestrictionDialog();
             case DIALOG_WEEK_START:
-            	return createRestrictionDialog();
-            case DIALOG_BACK_UP:
-            	return createRestrictionDialog();  
-            case DIALOG_STATISTICS:
-            	return createRestrictionDialog();
-            case DIALOG_SKINS:
-            	return createRestrictionDialog();
+            	return createWeekStartDialog();
+//            case DIALOG_BACK_UP:
+//            	return createRestrictionDialog();  
+//            case DIALOG_STATISTICS:
+//            	return createRestrictionDialog();
+//            case DIALOG_SKINS:
+//            	return createRestrictionDialog();
         }
         return super.onCreateDialog(id);
     }
@@ -446,10 +465,94 @@ public class WomenCalendarActivity extends Activity {
     	.create();
     }
     
+    
+    private Dialog createSelectLocaleDialog() {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View lanSetView = factory.inflate(R.layout.lanset_dialog, null);
+        final RadioGroup localeGroup = (RadioGroup)lanSetView.findViewById(R.id.lan_group);
+        ArrayList<String> localeList = new ArrayList<String>(Arrays.asList(Resources.getSystem().getAssets().getLocales()));
+        final String[] locales = getAssets().getLocales();
+        for (int i = 1; i < localeList.size(); i++) {
+            RadioButton radioBtn = new RadioButton(this);
+            Locale locale = new Locale(localeList.get(i));
+            radioBtn.setText(locale.getDisplayLanguage());
+            radioBtn.setId(i);
+            localeGroup.addView(radioBtn);
+        }
+//        Locale locale = new Locale(Utils.getLocale(mContext));
+        for(int i = 0;i<locales.length;i++){
+            if(locales[i].toString().endsWith(Utils.getLocale(mContext))){
+                localeGroup.check(i);
+                break;
+            }
+        }
+        
+        return new  AlertDialog.Builder(this)
+        .setTitle(R.string.cycle_period_length)
+        .setView(lanSetView)
+        .setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // TODO Auto-generated method stub
+                SharedPreferences appShared = 
+                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+                Editor editor = appShared.edit();
+                editor.putString(Utils.SHARED_PREF_LOCALE,
+                        locales[localeGroup.getCheckedRadioButtonId()-1]);
+                editor.commit();
+                }
+        })
+        .setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // TODO Auto-generated method stub
+                //finish();
+            }
+            
+        })
+        .create();       
+    }
+    private Dialog createWeekStartDialog() {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View daySetView = factory.inflate(R.layout.dayset_dialog, null);
+        final RadioGroup daygroup = (RadioGroup)daySetView.findViewById(R.id.day_group);
+        String[] dayStrings = getResources().getStringArray(R.array.dayset_values);
+        for (int i = 0; i < dayStrings.length; i++) {
+            RadioButton radioBtn = new RadioButton(this);
+            radioBtn.setText(dayStrings[i]);
+            radioBtn.setId(i);
+            daygroup.addView(radioBtn);
+        }
+        daygroup.check(Utils.getStartDayOfWeek(mContext));
+
+        return new  AlertDialog.Builder(this)
+        .setTitle(R.string.cycle_period_length)
+        .setView(daySetView)
+        .setPositiveButton(R.string.save,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // TODO Auto-generated method stub
+                SharedPreferences appShared = 
+                        getApplicationContext().getSharedPreferences(null, MODE_PRIVATE);
+                Editor editor = appShared.edit();
+                editor.putInt(Utils.SHARED_PREF_START_DAY,
+                        daygroup.getCheckedRadioButtonId());
+                editor.commit();
+                }
+        })
+        .setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // TODO Auto-generated method stub
+                //finish();
+            }
+            
+        })
+        .create();       
+    }
     private Dialog createCyclePeriodLengthDialog(){
         LayoutInflater factory = LayoutInflater.from(this);
         final View editEntryView = factory.inflate(R.layout.alert_dialog_cycle_period_entry, null);
-        final Cursor c = mContentResolver.query(Profile.CONTENT_URI,null,null,null,null);
 
     	return new  AlertDialog.Builder(this)
     	.setTitle(R.string.cycle_period_length)
@@ -460,25 +563,13 @@ public class WomenCalendarActivity extends Activity {
 				// TODO Auto-generated method stub
 				EditText cycleLength = (EditText)editEntryView.findViewById(R.id.cycle_length_value);
 				EditText periodLength = (EditText)editEntryView.findViewById(R.id.period_length_value);
-				CheckBox autoForecastCB = (CheckBox)editEntryView.findViewById(R.id.auto_forecast);
-				int autoForecast =  autoForecastCB.isChecked()? 1:0;
 				
-				int rowId = 0;
-				if(c != null && c.getCount() != 0){
-					c.moveToFirst();
-					rowId = c.getInt(c.getColumnIndex(Profile._ID));
-					c.close();
-				}
+				Utils.setCycleLength(mContext, Integer.parseInt(cycleLength.getText().toString()));
+				Utils.setPeriodLength(mContext, Integer.parseInt(periodLength.getText().toString()));
 				
-				if(rowId > 0){
-					ContentValues values = new ContentValues();
-					values.put(Profile.CYCLELENGTH, cycleLength.getText().toString());
-					values.put(Profile.PERIODLENGTH, periodLength.getText().toString());
-					values.put(Profile.AUTOMATICFORECAST,autoForecast);
-					mContentResolver.update(Profile.CONTENT_URI,values,"Profile._ID=?",new String[]{String.valueOf(rowId)});
-				}
-				
-				//finish();
+				ContentValues values = new ContentValues();
+				values.put(Record.INTVALUE, periodLength.getText().toString());
+				mContentResolver.update(Record.CONTENT_URI, values, "type=?", new String[]{Utils.RECORD_TYPE_START});
 			}
     		
     	})
